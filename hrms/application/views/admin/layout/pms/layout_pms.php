@@ -9,7 +9,11 @@ $user_info = $this->Xin_model->read_user_info($session['user_id']);
 <!--html header-->
 <?php $this->load->view('admin/layout/pms/header.php'); ?>
 <!--html header-->
-
+<style>
+     body {
+        font-weight: bold !important;
+    }
+</style>
 <body id="main-body"
     class="loggedin fix-header card-no-border fix-sidebar {{ config('settings.css_kanban') }} {{ runtimePreferenceLeftmenuPosition(auth()->user()->left_menu_position) }} {{ $page['page'] ?? '' }}">
 

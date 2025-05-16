@@ -222,9 +222,13 @@
         content: "*";
         color: red;
     }
-        body {
-        font-weight: bold !important;
+    body{
+
+        font-family:Arial, Helvetica, sans-serif!important;
     }
+       *{
+        font-weight: bold!important;
+       }
     </style>
 
     <!--SET DYNAMIC VARIABLE IN JAVASCRIPT-->
