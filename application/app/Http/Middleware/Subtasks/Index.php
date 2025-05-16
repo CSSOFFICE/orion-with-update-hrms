@@ -1,0 +1,110 @@
+<?php
+
+/** --------------------------------------------------------------------------------
+ * This middleware class handles [index] precheck processes for milestones
+ *
+ * @package    Grow CRM
+ * @author     NextLoop
+ *----------------------------------------------------------------------------------*/
+
+namespace App\Http\Middleware\Subtasks;
+
+use App\Models\Subtask;
+use App\Models\Project;
+use App\Permissions\ProjectPermissions;
+use App\Permissions\TaskPermissions;
+
+use Closure;
+use Log;
+
+class Index
+{
+
+    /**
+     * The project permisson repository instance.
+     */
+    protected $projectpermissons;
+
+    /**
+     * Inject any dependencies here
+     *
+     */
+    public function __construct(ProjectPermissions $projectpermissons, TaskPermissions $taskpermissions)
+    {
+
+        $this->projectpermissons = $projectpermissons;
+
+        $this->taskpermissions = $taskpermissions;
+    }
+    /**
+     * This middleware does the following
+     *   2. checks users permissions to [view] milestones
+     *   3. modifies the request object as needed
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next)
+    {
+
+        //various frontend and visibility settings
+        $this->fronteEnd();
+        $iid= request('subtaskresource_id')?? request('taskresource_id');
+
+        if (!$project = \App\Models\Project::Where('project_id',$iid)->first()) {
+            Log::error("Subtask project could not be found", ['process' => '[permissions][subtasks][index]', 'ref' => config('app.debug_ref'), 'function' => __function__, 'file' => basename(__FILE__), 'line' => __line__, 'path' => __file__, 'project id' => request('taskresource_id')]);
+            // abort(404);
+        }
+
+        //team user - management options
+        if (auth()->user()->is_team) {
+            if ($project->assignedperm_tasks_manage == 'yes') {
+                if (config('system.settings_projects_assignedperm_subtask_manage') == 'yes') {
+
+                }
+
+            }
+            config([
+
+                'visibility.list_page_actions_add_button' => true,
+                'visibility.subtask_actions' => true,
+            ]);
+        }
+        // if (auth()->user()->is_team) {
+        //     if ($project->assignedperm_subtask_manage == 'yes' || $project->check('super-user', request('taskresource_id'))) {
+        //         if (config('system.settings_projects_assignedperm_subtask_manage') == 'yes') {
+        //         }
+        //     }
+        // }
+
+
+        //user permissions
+        if ($this->projectpermissons->check('view',$iid)) {
+            return $next($request);
+        }
+
+        //permission denied
+        Log::error("permission denied", ['process' => '[permissions][subtask][index]', 'ref' => config('app.debug_ref'), 'function' => __function__, 'file' => basename(__FILE__), 'line' => __line__, 'path' => __file__]);
+        // abort(403);
+    }
+
+
+    /*
+     * various frontend and visibility settings
+     */
+    private function fronteEnd()
+    { $iid= request('subtaskresource_id')?? request('taskresource_id');
+
+        /**
+         * shorten resource_type and resource_id (for easy appending in blade templates - action url's)
+         * [usage]
+         *   replace the usual url('milestone/edit/etc') with urlResource('milestone/edit/etc'), in blade templated
+         *   usually in the ajax.blade.php files (actions links)
+         * */
+        request()->merge([
+            'resource_query' => 'ref=list&taskresource_type=' . request('taskresource_type') . '&taskresource_id=' . $iid,
+            'filter_subtask_projectid' =>$iid,
+        ]);
+    }
+}

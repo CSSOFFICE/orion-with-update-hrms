@@ -1,0 +1,1 @@
+<?php /**PATH C:\xampp\htdocs\orion-ci-laravel\application\resources\views/pages/bill/components/elements/templates/others.blade.php ENDPATH**/ ?>

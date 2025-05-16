@@ -1,0 +1,16 @@
+<!-- action buttons -->
+<?php echo $__env->make('misc.list-pages-actions', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+<!-- action buttons -->
+
+<!--stats panel-->
+<div id="estimates-stats-wrapper" class="stats-wrapper card-embed-fix">
+<?php if(@count($estimates) > 0): ?> <?php echo $__env->make('misc.list-pages-stats', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?> <?php endif; ?>
+</div>
+<!--stats panel-->
+
+<!--estimates table-->
+<div class="card-embed-fix">
+<?php echo $__env->make('pages.variation.components.table.wrapper', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+</div>
+<!--estimates table-->
+<?php /**PATH C:\xampp\htdocs\Orion\application\resources\views/pages/variation/tabswrapper.blade.php ENDPATH**/ ?>

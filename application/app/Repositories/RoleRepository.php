@@ -1,0 +1,204 @@
+<?php
+
+/** --------------------------------------------------------------------------------
+ * This repository class manages all the data absctration for roles
+ *
+ * @package    Grow CRM
+ * @author     NextLoop
+ *----------------------------------------------------------------------------------*/
+
+namespace App\Repositories;
+
+use App\Models\Role;
+use Illuminate\Support\Facades\DB;
+use Log;
+
+class RoleRepository
+{
+
+    /**
+     * The roles repository instance.
+     */
+    protected $roles;
+
+    /**
+     * Inject dependecies
+     */
+    public function __construct(Role $roles)
+    {
+        $this->roles = $roles;
+    }
+
+    /**
+     * Get all team roles
+     * @return object
+     */
+    public function allTeamRoles()
+    {
+        return $this->roles->All()->whereNotIn('role_name', 'Client');
+    }
+
+    /**
+     * Search model
+     * @param int $id optional for getting a single, specified record
+     * @return object role collection
+     */
+    public function search($id = '')
+    {
+
+        $roles = $this->roles->newQuery();
+
+        // all client fields
+        $roles->selectRaw('*');
+
+        //count users on this role
+        $roles->selectRaw("(SELECT COUNT(*)
+                                      FROM users
+                                      WHERE role_id = roles.role_id
+                                      AND status NOT IN('deleted'))
+                                      AS count_users");
+
+        if (is_numeric($id)) {
+            $roles->where('role_id', $id);
+        }
+
+        //filter clients
+        if (request()->filled('filter_role_type')) {
+            $roles->where('role_type', request('filter_role_type'));
+        }
+
+        //default sorting
+        //$roles->orderBy('role_id', 'desc');
+        $roles->orderBy('role_name', 'asc');
+
+        // Get the results and return them.
+        return $roles->paginate(config('system.settings_system_pagination_limits'));
+    }
+
+    /**
+     * Create a new record
+     * @return mixed int|bool
+     */
+    public function create()
+    {
+
+        //save new user
+        $role = new $this->roles;
+
+        //valid role values
+        $valid = [0, 1, 2, 3];
+
+        //data - for security,we will do some extra validations for each entry
+        $role->role_name = ucwords(request('role_name'));
+        $role->role_clients = (in_array(request('role_clients'), $valid)) ? request('role_clients') : 0;
+        $role->role_contacts = (in_array(request('role_contacts'), $valid)) ? request('role_contacts') : 0;
+        $role->role_invoices = (in_array(request('role_invoices'), $valid)) ? request('role_invoices') : 0;
+        $role->role_estimates = (in_array(request('role_estimates'), $valid)) ? request('role_estimates') : 0;
+        $role->role_items = (in_array(request('role_items'), $valid)) ? request('role_items') : 0;
+        $role->role_tasks = (in_array(request('role_tasks'), $valid)) ? request('role_tasks') : 0;
+        $role->role_projects = (in_array(request('role_projects'), $valid)) ? request('role_projects') : 0;
+        $role->role_leads = (in_array(request('role_leads'), $valid)) ? request('role_leads') : 0;
+        $role->role_expenses = (in_array(request('role_expenses'), $valid)) ? request('role_expenses') : 0;
+        $role->role_timesheets = (in_array(request('role_timesheets'), $valid)) ? request('role_timesheets') : 0;
+        $role->role_tickets = (in_array(request('role_tickets'), $valid)) ? request('role_tickets') : 0;
+        $role->role_knowledgebase = (in_array(request('role_knowledgebase'), $valid)) ? request('role_knowledgebase') : 0;
+        $role->role_reports = (in_array(request('role_reports'), $valid)) ? request('role_reports') : 0;
+        $role->role_assign_projects = (request('role_assign_projects') == 'yes') ? 'yes' : 'no';
+        $role->role_assign_leads = (request('role_assign_leads') == 'yes') ? 'yes' : 'no';
+        $role->role_invoices_scope = (request('role_invoices_scope') == 'yes') ? 'yes' : 'no';
+        $role->role_reports_scope = (request('role_reports_scope') == 'yes') ? 'yes' : 'no';
+        $role->role_assign_tasks = (request('role_assign_tasks') == 'yes') ? 'yes' : 'no';
+        $role->role_tasks_scope = (request('role_tasks_scope') == 'on') ? 'global' : 'own';
+        $role->role_projects_scope = (request('role_projects_scope') == 'on') ? 'global' : 'own';
+        $role->role_leads_scope = (request('role_leads_scope') == 'on') ? 'global' : 'own';
+        $role->role_expenses_scope = (request('role_expenses_scope') == 'on') ? 'global' : 'own';
+        $role->role_timesheets_scope = (request('role_timesheets_scope') == 'on') ? 'global' : 'own';
+
+        $role->role_type = 'team';
+
+        //save and return id
+        if ($role->save()) {
+            return $role->role_id;
+        } else {
+            Log::error("record could not be created - database error", ['process' => '[RoleRepository]', config('app.debug_ref'), 'function' => __function__, 'file' => basename(__FILE__), 'line' => __line__, 'path' => __file__]);
+            return false;
+        }
+    }
+
+    /**
+     * update a record
+     * @param int $id record id
+     * @return mixed int|bool
+     */
+    public function update($id)
+    {
+
+        //get the record
+        if (!$role = $this->roles->find($id)) {
+            return false;
+        }
+
+        //valid role values
+        $valid = [0, 1, 2, 3];
+
+        //data - for security,we will do some extra validations for each entry
+        $role->role_name = ucwords(request('role_name'));
+        $role->role_clients = (in_array(request('role_clients'), $valid)) ? request('role_clients') : 0;
+        $role->role_contacts = (in_array(request('role_contacts'), $valid)) ? request('role_contacts') : 0;
+        $role->role_invoices = (in_array(request('role_invoices'), $valid)) ? request('role_invoices') : 0;
+        $role->role_estimates = (in_array(request('role_estimates'), $valid)) ? request('role_estimates') : 0;
+        $role->role_items = (in_array(request('role_items'), $valid)) ? request('role_items') : 0;
+        $role->role_tasks = (in_array(request('role_tasks'), $valid)) ? request('role_tasks') : 0;
+        $role->role_projects = (in_array(request('role_projects'), $valid)) ? request('role_projects') : 0;
+        $role->role_leads = (in_array(request('role_leads'), $valid)) ? request('role_leads') : 0;
+        $role->role_expenses = (in_array(request('role_expenses'), $valid)) ? request('role_expenses') : 0;
+        $role->role_timesheets = (in_array(request('role_timesheets'), $valid)) ? request('role_timesheets') : 0;
+        $role->role_tickets = (in_array(request('role_tickets'), $valid)) ? request('role_tickets') : 0;
+        $role->role_knowledgebase = (in_array(request('role_knowledgebase'), $valid)) ? request('role_knowledgebase') : 0;
+        $role->role_reports = (in_array(request('role_reports'), $valid)) ? request('role_reports') : 0;
+        $role->role_inventary = (in_array(request('role_inventary'), $valid)) ? request('role_inventary') : 0;
+        $role->role_budget = (in_array(request('role_budget'), $valid)) ? request('role_budget') : 0;
+        $role->role_payments = (in_array(request('role_payment'), $valid)) ? request('role_payment') : 0;
+        $role->role_delivery_address = (in_array(request('role_delivery_address'), $valid)) ? request('role_delivery_address') : 0;
+        $role->role_billing_address = (in_array(request('role_billing_address'), $valid)) ? request('role_billing_address') : 0;
+        
+        $role->role_variation_order = (in_array(request('role_variation_order'), $valid)) ? request('role_variation_order') : 0;
+        $role->role_purchase_requisiton = (in_array(request('role_purchase_requisiton'), $valid)) ? request('role_purchase_requisiton') : 0;
+        $role->role_reports_scope = (request('role_reports_scope') ==  'on') ? 'global' : 'own';
+
+        $role->role_assign_projects = (request('role_assign_projects') == 'yes') ? 'yes' : 'no';
+        $role->role_assign_leads = (request('role_assign_leads') == 'yes') ? 'yes' : 'no';
+        $role->role_assign_tasks = (request('role_assign_tasks') == 'yes') ? 'yes' : 'no';
+        $role->role_invoices_scope = (request('role_invoices_scope') == 'on') ? 'global' : 'own';
+        $role->role_inventary_scope = (request('role_inventary_scope') == 'on') ? 'global' : 'own';
+        $role->role_budget_scope = (request('role_budget_scope') == 'on') ? 'global' : 'own';
+        $role->role_purchase_requisiton_scope = (request('role_purchase_requisiton_scope') == 'on') ? 'global' : 'own';
+        $role->role_variation_order_scope = (request('role_variation_order_scope') == 'on') ? 'global' : 'own';
+        $role->role_payment_scope = (request('role_pyment_scope') == 'on') ? 'global' : 'own';
+        $role->role_estimates_scope = (request('role_estimates_scope') == 'on') ? 'global' : 'own';
+        $role->role_items_scope = (request('role_items_scope') == 'on') ? 'global' : 'own';
+        $role->role_clients_scope = (request('role_clients_scope') == 'on') ? 'global' : 'own';
+        $role->role_contacts_scope = (request('role_contacts_scope') == 'on') ? 'global' : 'own';
+        $role->role_tasks_scope = (request('role_tasks_scope') == 'on') ? 'global' : 'own';
+        $role->role_projects_scope = (request('role_projects_scope') == 'on') ? 'global' : 'own';
+        $role->role_leads_scope = (request('role_leads_scope') == 'on') ? 'global' : 'own';
+        $role->role_expenses_scope = (request('role_expenses_scope') == 'on') ? 'global' : 'own';
+        $role->role_timesheets_scope = (request('role_timesheets_scope') == 'on') ? 'global' : 'own';
+        $role->role_manage_knowledgebase_categories = (request('role_manage_knowledgebase_categories') == 'yes') ? 'yes' : 'no';
+        $role->role_set_project_permissions = (request('role_set_project_permissions') == 'yes') ? 'yes' : 'no';
+        $role->role_delivery_address_scope = (request('role_delivery_address_scope') == 'on') ? 'global' : 'own';
+        $role->role_billing_address_scope = (request('role_billing_address_scope') == 'on') ? 'global' : 'own';
+
+        DB::table('xin_user_roles')->where('role_id', $id)->update([
+            'role_name' => ucwords(request('role_name'))
+        ]);
+
+        //save
+        if ($role->save()) {
+            return $role->role_id;
+        } else {
+            Log::error("record could not be updated - database error", ['process' => '[RoleRepository]', config('app.debug_ref'), 'function' => __function__, 'file' => basename(__FILE__), 'line' => __line__, 'path' => __file__]);
+            return false;
+        }
+    }
+}
