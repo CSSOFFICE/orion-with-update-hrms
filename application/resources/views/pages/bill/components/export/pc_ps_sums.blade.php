@@ -6,8 +6,11 @@
 
     </tr>
     <tr>
-        <td colspan="6" style="text-align:left!important; background-color:yellow;height:50px;vertical-align:top;">
-            <strong>{{ strtoupper($project_name) }}</strong>
+        <td colspan="6" style="text-align:left!important; background-color:yellow;height:100px;vertical-align:top;">
+          <strong>{{ strtoupper($project_name)??'No Project Attached' }}</strong><br>
+            <strong>{{ strtoupper($client_name) }}</strong><br>
+            <strong>{{ strtoupper($client_email) }}</strong><br>
+            <strong>{{ strtoupper($client_phone) }}</strong><br>
         </td>
     </tr>
 </table>

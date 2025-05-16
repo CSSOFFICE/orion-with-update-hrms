@@ -10,7 +10,7 @@
 
 <section id="basic-listgroup">
   <div class="row match-heights <?php echo $get_animate?>">
-    <div class="col-lg-3 col-md-3">
+    <div class="col-lg-3 col-md-4">
       <div class="card">
         <div class="card-blocks">
           <div class="list-group"> <a class="list-group-item list-group-item-action nav-tabs-link hrsale-tab-item active" href="#page_layout" data-profile="1" data-profile-block="page_layout" data-toggle="tab" aria-expanded="true" id="setting_1"> <i class="fa fa-cubes"></i> <?php echo $this->lang->line('xin_page_layouts');?> </a> <a class="list-group-item list-group-item-action nav-tabs-link hrsale-tab-item" href="#notification" data-profile="4" data-profile-block="notification" data-toggle="tab" aria-expanded="true" id="setting_4"> <i class="fa fa-exclamation-circle"></i> <?php echo $this->lang->line('xin_notification_position');?> </a> <a class="list-group-item list-group-item-action nav-tabs-link hrsale-tab-item" href="#form_design" data-profile="5" data-profile-block="form_design" data-toggle="tab" aria-expanded="true" id="setting_5"> <i class="fa fa-edit"></i> <?php echo $this->lang->line('xin_theme_form_design');?> </a> <a class="list-group-item list-group-item-action nav-tabs-link hrsale-tab-item" href="#company_logo" data-profile="6" data-profile-block="company_logo" data-toggle="tab" aria-expanded="true" id="setting_6"> <i class="fa fa-image"></i> <?php echo $this->lang->line('xin_system_logos');?> </a> <a class="list-group-item list-group-item-action nav-tabs-link hrsale-tab-item" href="#signin_logo" data-profile="7" data-profile-block="signin_logo" data-toggle="tab" aria-expanded="true" id="setting_7"> <i class="fa fa-file-image-o"></i> <?php echo $this->lang->line('xin_theme_signin_page_logo_title');?> </a> <a class="list-group-item list-group-item-action nav-tabs-link hrsale-tab-item" href="#job_page_logo" data-profile="8" data-profile-block="job_page_logo" data-toggle="tab" aria-expanded="true" id="setting_8"> <i class="fa fa-file-image-o"></i> <?php echo $this->lang->line('xin_theme_job_page_logo_title');?> </a> <a class="list-group-item list-group-item-action nav-tabs-link hrsale-tab-item" href="#payroll_logo" data-profile="9" data-profile-block="payroll_logo" data-toggle="tab" aria-expanded="true" id="setting_9"> <i class="fa fa-camera-retro"></i> <?php echo $this->lang->line('xin_theme_payroll_logo_title');?> </a>
@@ -21,7 +21,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-9 current-tab animated fadeInRight" id="page_layout">
+    <div class="col-lg-9 col-md-8 current-tab animated fadeInRight" id="page_layout">
       <div class="box">
         <div class="box-header with-border">
           <h3 class="box-title"> <?php echo $this->lang->line('xin_page_layouts');?> </h3>
@@ -208,7 +208,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-9 current-tab animated fadeInRight" id="form_design" style="display:none;">
+    <div class="col-lg-9 col-md-8 current-tab animated fadeInRight" id="form_design" style="display:none;">
       <div class="box">
         <div class="box-header with-border">
           <h3 class="box-title"> <?php echo $this->lang->line('xin_theme_form_design');?> </h3>
@@ -220,7 +220,7 @@
             <?php echo form_open('admin/theme/form_design/', $attributes, $hidden);?>
             <div class="bg-white">
               <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-12">
                   <div class="form-group">
                     <label for="notification_position"><?php echo $this->lang->line('xin_theme_form_design_input');?></label>
                     <select class="form-control" name="form_design" data-plugin="select_hrm" data-placeholder="<?php echo $this->lang->line('xin_theme_form_design_input');?>">
@@ -254,7 +254,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-9 current-tab animated fadeInRight" id="notification" style="display:none;">
+    <div class="col-lg-9 col-md-8 current-tab animated fadeInRight" id="notification" style="display:none;">
       <div class="box">
         <div class="box-header with-border">
           <h3 class="box-title"> <?php echo $this->lang->line('xin_notification_position');?> </h3>
@@ -313,7 +313,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-9 current-tab animated fadeInRight" id="company_logo" style="display:none;">
+    <div class="col-lg-9 col-md-8 current-tab animated fadeInRight" id="company_logo" style="display:none;">
       <div class="box mb-4">
         <div class="box-header with-border">
           <h3 class="box-title"> <?php echo $this->lang->line('xin_system_logos');?> </h3>
@@ -372,7 +372,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-9 current-tab animated fadeInRight" id="signin_logo" style="display:none;">
+    <div class="col-lg-9 col-md-8 current-tab animated fadeInRight" id="signin_logo" style="display:none;">
       <div class="box mb-4">
         <div class="box-header with-border">
           <h3 class="box-title"> <?php echo $this->lang->line('xin_theme_signin_page_logo_title');?> </h3>
@@ -408,7 +408,7 @@
           <?php echo form_close(); ?> </div>
       </div>
     </div>
-    <div class="col-md-9 current-tab animated fadeInRight" id="job_page_logo" style="display:none;">
+    <div class="col-lg-9 col-md-8 current-tab animated fadeInRight" id="job_page_logo" style="display:none;">
       <div class="box mb-4">
         <div class="box-header with-border">
           <h3 class="box-title"> <?php echo $this->lang->line('xin_theme_job_page_logo_title');?> <small>(<?php echo $this->lang->line('left_frontend');?>)</small> </h3>
@@ -444,7 +444,7 @@
           <?php echo form_close(); ?> </div>
       </div>
     </div>
-    <div class="col-md-9 current-tab animated fadeInRight" id="payroll_logo" style="display:none;">
+    <div class="col-lg-9 col-md-8 current-tab animated fadeInRight" id="payroll_logo" style="display:none;">
       <div class="box">
         <div class="box-header with-border">
           <h3 class="box-title"> <?php echo $this->lang->line('xin_theme_payroll_logo_title');?> <small>(<?php echo $this->lang->line('xin_for_pdf');?>)</small> </h3>
@@ -481,7 +481,7 @@
       </div>
     </div>
     <?php if($system[0]->module_orgchart=='true'){?>
-    <div class="col-md-9 current-tab animated fadeInRight" id="org_chart" style="display:none;">
+    <div class="col-lg-9 col-md-8 current-tab animated fadeInRight" id="org_chart" style="display:none;">
       <div class="box">
         <div class="box-header with-border">
           <h3 class="box-title"> <?php echo $this->lang->line('xin_org_chart_title');?> </h3>

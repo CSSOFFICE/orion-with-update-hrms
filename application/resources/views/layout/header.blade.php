@@ -10,10 +10,10 @@
     <base href="{{ url('/') }}" target="_self">
 
     <!--JQUERY & OTHER HEADER JS-->
-    <script src="/css/orion/public/vendor/js/vendor.header.js?v={{ config('system.versioning') }}"></script>
+    <script src="/orion/public/vendor/js/vendor.header.js?v={{ config('system.versioning') }}"></script>
 
     <!--BOOTSTRAP-->
-    <link href="/css/orion/public/vendor/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="/orion/public/vendor/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -28,34 +28,34 @@
 
 
     <!--VENDORS CSS-->
-    <link rel="stylesheet" href="/css/orion/public/vendor/css/vendor.css?v={{ config('system.versioning') }}">
+    <link rel="stylesheet" href="/orion/public/vendor/css/vendor.css?v={{ config('system.versioning') }}">
 
     <!--THEME STYLE-->
     {{-- <link href="{{ config('theme.selected_theme_css') }} " rel="stylesheet"> --}}
-    <link href="/css/orion/public/themes/default/css/style.css?v=1 " rel="stylesheet">
+    <link href="/orion/public/themes/default/css/style.css?v=1 " rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet"
-        href="/css/orion/hrms/skin/hrsale_assets/theme_assets/bower_components/font-awesome/css/font-awesome.min.css">
+        href="/orion/hrms/skin/hrsale_assets/theme_assets/bower_components/font-awesome/css/font-awesome.min.css">
 
     <!--USERS CUSTON CSS FILE-->
-    <link href="/css/orion/public/css/custom.css?v={{ config('system.versioning') }}" rel="stylesheet">
+    <link href="/orion/public/css/custom.css?v={{ config('system.versioning') }}" rel="stylesheet">
 
     <!-- Favicon icon -->
-    <link rel="apple-touch-icon" sizes="57x57" href="/css/orion/public/images/favicon/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/css/orion/public/images/favicon/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/css/orion/public/images/favicon/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/css/orion/public/images/favicon/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/css/orion/public/images/favicon/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/css/orion/public/images/favicon/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/css/orion/public/images/favicon/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/css/orion/public/images/favicon/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/css/orion/public/images/favicon/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/css/orion/public/images/favicon/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/css/orion/public/images/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/css/orion/public/images/favicon/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/css/orion/public/images/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="/orion/public/images/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/orion/public/images/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/orion/public/images/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/orion/public/images/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/orion/public/images/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/orion/public/images/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/orion/public/images/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/orion/public/images/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/orion/public/images/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/orion/public/images/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/orion/public/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/orion/public/images/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/orion/public/images/favicon/favicon-16x16.png">
     <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/css/orion/public/images/favicon/ms-icon-144x144.png">
+    <meta name="msapplication-TileImage" content="/orion/public/images/favicon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
     <style>
@@ -143,7 +143,7 @@
     </script>
 
     <!--boot js-->
-    <script src="/css/orion/public/js/core/head.js?v={{ config('system.versioning') }}"></script>
+    <script src="/orion/public/js/core/head.js?v={{ config('system.versioning') }}"></script>
 
     <!--[note: no sanitizing required] for this trusted content, which is added by the admin-->
     {!! config('system.settings_theme_head') !!}

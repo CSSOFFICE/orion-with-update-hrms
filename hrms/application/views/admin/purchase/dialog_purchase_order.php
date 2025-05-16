@@ -82,10 +82,12 @@ if (isset($_GET['jd']) && isset($_GET['purchase_order_id']) && $_GET['data'] == 
                 </select>
             </div>
             <div class="col-md-4">
-
-                <label>Site Address:</label>
-                <textarea class="form-control" name="s_add1" id="s_add1" rows="5"><?php echo $site_add ?></textarea>
-
+                <label>Project Site Address</label>
+                <select name="s_add1" id="s_add1" class="form-control">
+                    <option>Select Site Address</option>
+                    <option value="others">Others</option>
+                </select>
+                <textarea class="form-control" rows="5" cols="80" name="other_s_add1" id="other_s_add1" class="form-control" style="display:none; margin-top:10px;"></textarea>
             </div>
             <div class="col-md-4">
                 <label>Milestone</label>
@@ -359,6 +361,8 @@ if (isset($_GET['jd']) && isset($_GET['purchase_order_id']) && $_GET['data'] == 
                 }
             });
             $(document).ready(function() {
+
+                getProjectAddress1();
                 loadPOData(<?php echo $sup_bill_id; ?>);
                 // Trigger task loading on milestone change
                 $("#milestone_id1").on('change', function() {
@@ -428,7 +432,7 @@ if (isset($_GET['jd']) && isset($_GET['purchase_order_id']) && $_GET['data'] == 
                 $.ajax({
                     url: "<?php echo base_url('admin/purchase/get_order_line/') ?>" + "<?php echo $supplier_id; ?>" + "/" + "<?php echo $_GET['purchase_order_id']; ?>",
                     type: "POST",
-                    success: function(response) {                       
+                    success: function(response) {
                         globalResponse = response;
                         $("#terms1").val(response.record[0].terms).trigger("change");
                         for (var i = 0; i < response.record.length; i++) {
@@ -601,7 +605,7 @@ if (isset($_GET['jd']) && isset($_GET['purchase_order_id']) && $_GET['data'] == 
                     url: "<?php echo base_url() . 'admin/purchase/get_sup_product/'; ?>" + "<?php echo $supplier_id; ?>",
                     success: function(data) {
                         var billing_data = jQuery.parseJSON(data);
-                        
+
 
                         var targetSelect1 = $("#sup_billing1"); // Refers to the billing dropdown
 
@@ -665,7 +669,7 @@ if (isset($_GET['jd']) && isset($_GET['purchase_order_id']) && $_GET['data'] == 
                     url: "<?php echo base_url() . 'admin/purchase/get_sup_product/'; ?>" + "<?php echo $supplier_id; ?>",
                     success: function(data) {
                         var billing_data = jQuery.parseJSON(data);
-                        
+
 
                         var targetSelect1 = $("#sup_billing1"); // Refers to the billing dropdown
 
@@ -719,7 +723,7 @@ if (isset($_GET['jd']) && isset($_GET['purchase_order_id']) && $_GET['data'] == 
                     url: "<?php echo base_url() . 'admin/purchase/get_sup_product/'; ?>" + "<?php echo $supplier_id; ?>",
                     success: function(data) {
                         var billing_data = jQuery.parseJSON(data);
-                        
+
                         var targetSelect1 = $("#sup_billing1"); // Refers to the billing dropdown
                         // Empty the dropdown before adding new options
                         targetSelect1.empty();
@@ -768,7 +772,7 @@ if (isset($_GET['jd']) && isset($_GET['purchase_order_id']) && $_GET['data'] == 
                     url: "<?php echo base_url() . 'admin/purchase/get_sup_product/'; ?>" + "<?php echo $supplier_id; ?>",
                     success: function(data) {
                         var billing_data = jQuery.parseJSON(data);
-                        
+
 
                         var targetSelect1 = $("#sup_billing1"); // Refers to the billing dropdown
 
@@ -883,29 +887,60 @@ if (isset($_GET['jd']) && isset($_GET['purchase_order_id']) && $_GET['data'] == 
 
             function getProjectAddress1() {
                 var prj_id = $('#project1').val();
+                const oldSiteAddress = "<?php echo $site_add; ?>";
+
                 $.ajax({
-                    type: "POST",
-                    url: "<?php echo base_url() . 'admin/purchase/get_project_details/'; ?>" + prj_id,
-                    data: JSON,
-                    success: function(data) {
-                        var product_data = jQuery.parseJSON(data);
-                        if (product_data.length > 0 && product_data[0].project_address !== null) {
-                            $("#s_add1").text(product_data[0].project_address);
+                    url: "<?php echo base_url('admin/purchase/get_project_data_by_id/'); ?>" + prj_id,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(response) {
+                        projectData = response;
+
+                        const select = $('#s_add1');
+                        select.empty();
+                        select.append('<option value="">Select Site Address</option>');
+
+                        response.forEach(function(item) {
+                            select.append('<option value="' + item.project_site + '">' + item.project_site + '</option>');
+                        });
+
+                        select.append('<option value="others">Others</option>');
+
+                        // Check if oldSiteAddress matches any site address
+                        let matched = projectData.find(item => item.project_site === oldSiteAddress);
+                        if (matched) {
+                            select.val(oldSiteAddress);
+                            $('#other_s_add1').hide().val('');
+                        } else if (oldSiteAddress && oldSiteAddress !== "") {
+                            select.val('others');
+                            $('#other_s_add1').val(oldSiteAddress).show(); // ✅ Corrected here
                         } else {
-                            $("#s_add1").empty();
-                            handleAddressNotFound();
+                            select.val('');
+                            $('#other_s_add1').hide().val('');
                         }
+
+                        select.trigger('change'); // To ensure change logic is applied
                     },
                     error: function() {
-                        $("#s_add1").empty();
-
-                        handleAddressNotFound();
+                        alert('Failed to load site addresses.');
                     }
                 });
             }
 
+            // ✅ Bind change event only once
+            $('#s_add1').on('change', function() {
+                const selected = $(this).val();
+                if (selected == 'others') {
+                    $('#other_s_add1').show();
+                } else {
+                    $('#other_s_add1').hide().val('');
+                }
+            });
+
+
+
             function handleAddressNotFound() {
-                $("#s_add").text('');
+                $("#s_add1").text('');
 
                 toastr.error("Project Address Not Found");
             }
@@ -1018,7 +1053,6 @@ if (isset($_GET['jd']) && isset($_GET['purchase_order_id']) && $_GET['data'] == 
                 });
             }
         </script>
-
         <script>
             $("#edit_purchase_order").submit(function(e) {
 

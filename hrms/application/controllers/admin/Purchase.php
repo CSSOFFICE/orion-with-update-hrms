@@ -1920,7 +1920,7 @@ class Purchase extends MY_Controller
 			$data = array(
 				'po_for' => $this->input->post('name_customer'),
 				'project_id' => ($this->input->post('name_project')) ?? '',
-				'site_add' => $this->input->post('s_add'),
+				'site_address'	=> ($this->input->post('s_add')=='others')?$this->input->post('other_s_add'):$this->input->post('s_add'),
 				'inclusive_gst' => ($this->input->post('inclusive_gst') == "on") ? $this->input->post('inclusive_gst') : "off",
 				'gst' => ($this->input->post('order_gst2') == 'Select') ? $def_gst[0]->d_gst : $this->input->post('order_gst2'),
 				// 'discount' => ($this->input->post('discount2')) ?? 0,
@@ -2367,7 +2367,8 @@ class Purchase extends MY_Controller
 			$result = $this->db->update('purchase_order', [
 				'po_for' => $this->input->post('emp'),
 				'project_id' => $this->input->post('project'),
-				'site_add' => $this->input->post('s_add1'),
+				'site_add'	=> ($this->input->post('s_add1')=='others')?$this->input->post('other_s_add1'):$this->input->post('s_add1'),
+
 				// 'gst' => $this->input->post('order_gst'),
 				'discount' => $this->input->post('discount1'),
 				'sup_bill_id' => $this->input->post('supplier_billing1'),

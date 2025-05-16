@@ -41,6 +41,10 @@ if (!is_null($role_user)) {
         content: "*";
         color: red;
     }
+
+    body {
+        font-weight: bold !important;
+    }
 </style>
 
 <body
@@ -176,4 +180,5 @@ if (!is_null($role_user)) {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdn.datatables.net/plug-ins/1.13.6/sorting/datetime-moment.js"></script>
+
 </html>

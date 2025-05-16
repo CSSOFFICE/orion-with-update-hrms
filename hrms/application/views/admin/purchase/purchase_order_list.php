@@ -324,7 +324,7 @@
                 // Optional: set default address and supervisor
                 if (response.quotation_no && response.quotation_no.length > 0) {
                     $('#s_add').val(response.quotation_no[0].project_site);
-                    $('#supervisor').val(response.quotation_no[0].supervisor).trigger('change');
+
                 }
 
 
@@ -335,11 +335,7 @@
                     } else {
                         $('#other_s_add').hide();
 
-                        // Get the matched project data
-                        const matched = projectData.find(item => item.project_site === selected);
-                        if (matched) {
-                            $('#supervisor').val(matched.supervisor).trigger('change');
-                        }
+
                     }
                 });
 

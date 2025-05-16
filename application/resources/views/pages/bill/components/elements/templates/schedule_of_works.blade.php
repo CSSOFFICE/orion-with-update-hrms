@@ -61,49 +61,34 @@
                     'amount' => $SCWAmount,
                 ];
                 ?>
-                @php
-                    $letterCounter = 'A'; // Start for head as 'B'
-                    $rowCounter = 0; // Start row counter from 1
+                 @php
+                    $parentCounter = 1; // Fixed parent value
+                    $headCounter = 1; // Will increment only for 'head'
+                    $subtotal = 0;
+                    $amountSubtotal = 0;
                 @endphp
-
-                @php
-                    $letterCounter = 'A'; // Start for head as 'B'
-                    $rowCounter = 0; // Start row counter from 1
-                    $headIndex = 0; // Start head index from 0
-                @endphp
-
                 @foreach ($quotation_templates as $index => $data)
                     @if ($data->template_id == 3 && $data->quotation_no == $page['crumbs'][2])
                         @if ($data->type == 'head')
                             @php
-                                $rowCounter = 0; // Reset row counter when a new head is encountered
-                                $subtotal = 0; // Initialize subtotal for the current head
-                                $amountSubtotal = 0; // Initialize amount subtotal for the current head
+                                $serial = $parentCounter . '.' . $headCounter;
+                                $headCounter++; // Increment only for heads
                             @endphp
                             <tr class="fw-bold" style="background-color:#E2EFD9">
-                                <td>{{ $letterCounter }}</td> <!-- Alphabet for head -->
-                                <td class="wrap-text" width="width: 150px;word-wrap: break-word;">
+                                <td style="text-align:center;">{{ $serial }}</td> <!-- Numbering only for head -->
+                                <td class="wrap-text" width="150px" style="word-wrap: break-word;">
                                     <b>{!! clean($data->description) !!}</b>
                                 </td>
-                                <td colspan="12"><b>{{ $data->unit }}</b></td>
-                                <td></td>
-                                {{-- <td>{{$schw_array[$headIndex]}}</td> --}}
+                                <td><b>{{ $data->unit }}</b></td>
+                                <td colspan="12"><b>{{ $data->qty }}</b></td>
                             </tr>
-                            @php
-                                $letterCounter++; // Increment alphabet for next head
-                                $headIndex++; // Increment head index
-                                $rowCounter = 0;
-                            @endphp
                         @elseif($data->type == 'row')
                             @php
-                                $subtotal = 0;
-                                $amountSubtotal = 0;
-                                $rowCounter++; // Increment numeric counter for row
-                                $subtotal += $data->total; // Add row total to subtotal
-                                $amountSubtotal += $data->amount; // Add row amount to amountSubtotal
+                                $subtotal += $data->total;
+                                $amountSubtotal += $data->amount;
                             @endphp
                             <tr class="fw-bold">
-                                <td>{{ $rowCounter }}</td> <!-- Serial No. -->
+                                <td style="color:rgb(39, 97, 255);text-align:center;">-</td> <!-- Show -- for rows -->
                                 <td class="wrap-text">{{ $data->description }}</td>
                                 <td>{{ $data->unit }}</td>
                                 <td>{{ $data->qty }}</td>
@@ -118,18 +103,8 @@
                                 <td>{{ number_format($data->contractor_amount, 2) }}</td>
                                 <td>{{ number_format($data->rate, 2) }}</td>
                                 <td>{{ number_format($data->total, 2) }}</td>
-                                {{-- <td>{{ $data->amount }}</td> --}}
                             </tr>
                         @endif
-
-                        <!-- At the end of each head's rows, show the subtotal -->
-                        {{-- @if ($data->type == 'head' || ($loop->last && $rowCounter > 0))
-               <tr class="fw-bold">
-                   <td colspan="11" class="text-right">Subtotal:</td>
-                   <td>{{ $subtotal }}</td>
-        <td>{{ $amountSubtotal }}</td>
-        </tr>
-        @endif --}}
                     @endif
                 @endforeach
             @elseif (config('visibility.bill_mode') == 'editing')
@@ -181,7 +156,7 @@
                                         @endforeach
                                     </select>
                                 </td>
-                                <td><input type="hidden" name="qty[]" value="{{ $data->qty }}"
+                                <td><input type="text" name="qty[]" value="{{ $data->qty }}"
                                         class="form-control qty-input" min="1" style="width: 70px;" /></td>
                                 <td><input type="hidden" name="labour[]" value="{{ $data->labour }}"
                                         class="form-control rate-input humara-class a" style="width: 70px;" /></td>
@@ -415,7 +390,7 @@
                         ${uomOptions}
                     </select>
                 </td>
-                <td><input type="${inputType}" name="qty[]" value="" class="form-control qty-input" min="1" style="width: 70px;" /></td>
+                <td><input type="text" name="qty[]" value="" class="form-control qty-input" min="1" style="width: 70px;" /></td>
                 <td><input type="${inputType}" name="labour[]" value="" class="a form-control rate-input humara-class" style="width: 70px;" /></td>
                 <td><input type="${inputType}" name="material[]" value="" class="b form-control rate-input humara-class" style="width: 70px;" /></td>
                 <td><input type="${inputType}" name="misc[]" value="" class="c form-control rate-input humara-class" style="width: 70px;" /></td>

@@ -32,11 +32,11 @@
         <tbody id="preliminaries-table-body">
             <tr style="background-color:#FEF2CB">
                 <th class="text-start"></th>
-                <th class="text-start" style="text-align:left!important;"><b>BILL NO. 1 -
+                <th class="text-start" style="text-align:left!important;width:380px!important;"><b>BILL NO. 1 -
                         PRELIMINARIES</b></th>
                 <th class="text-start" colspan="12"></th>
-                <th class="text-start" style="text-align:left!important;">$<span id="grand-total"
-                        class="preli-gt"></span>
+                <th class="text-start" style="text-align:left!important;">$
+                    <span id="grand-total" class="preli-gt"></span>
                 </th>
                 </th>
 
@@ -53,36 +53,34 @@
                 ];
                 ?>
                 <?php
-                    $letterCounter = 'A'; // Start for head as 'B'
-                    $rowCounter = 0; // Start row counter from 1
-                    $subtotal = 0; // Initialize subtotal for the current head
+                    $parentCounter = 1; // Fixed parent value
+                    $headCounter = 1; // Will increment only for 'head'
+                    $subtotal = 0;
                     $amountSubtotal = 0;
                 ?>
+
                 <?php $__currentLoopData = $quotation_templates; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $data): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <?php if($data->template_id == 1 && $data->quotation_no == $page['crumbs'][2]): ?>
                         <?php if($data->type == 'head'): ?>
+                            <?php
+                                $serial = $parentCounter . '.' . $headCounter;
+                                $headCounter++; // Increment only for heads
+                            ?>
                             <tr class="fw-bold" style="background-color:#E2EFD9">
-                                <td><?php echo e($letterCounter); ?></td> <!-- Alphabet for head -->
-                                <td class="wrap-text" width="width: 150px;word-wrap: break-word;">
+                                <td style="text-align:center;"><?php echo e($serial); ?></td> <!-- Numbering only for head -->
+                                <td class="wrap-text" width="150px" style="word-wrap: break-word;">
                                     <b><?php echo clean($data->description); ?></b>
                                 </td>
-                                <td colspan="12"><b><?php echo e($data->unit); ?></b></td>
-                                <td></td>
-
+                                <td><b><?php echo e($data->unit); ?></b></td>
+                                <td colspan="12"><b><?php echo e($data->qty); ?></b></td>
                             </tr>
-                            <?php
-                                $letterCounter++; // Increment alphabet for next head
-                                $rowCounter = 0;
-                            ?>
                         <?php elseif($data->type == 'row'): ?>
                             <?php
-
-                                $rowCounter++; // Increment numeric counter for row
-                                $subtotal += $data->total; // Add row total to subtotal
-                                $amountSubtotal += $data->amount; // Add row amount to amountSubtotal
+                                $subtotal += $data->total;
+                                $amountSubtotal += $data->amount;
                             ?>
                             <tr class="fw-bold">
-                                <td><?php echo e($rowCounter); ?></td> <!-- Serial No. -->
+                                <td style="color:rgb(39, 97, 255);text-align:center;">-</td> <!-- Show -- for rows -->
                                 <td class="wrap-text"><?php echo e($data->description); ?></td>
                                 <td><?php echo e($data->unit); ?></td>
                                 <td><?php echo e($data->qty); ?></td>
@@ -124,19 +122,19 @@
                                         <i class="sl-icon-trash"></i>
                                     </button>
 
-                                     <!-- Add Row and Head Buttons -->
-                                     <?php if(config('visibility.bill_mode') == 'editing'): ?>
-                                     <button type="button"
-                                         class="add-row-after btn btn-outline-success btn-circle btn-sm"
-                                         title="Add Row After">
-                                         <i class="mdi mdi-plus-circle-outline"></i>
-                                     </button>
-                                     <button type="button"
-                                         class="add-head-after btn btn-outline-primary btn-circle btn-sm"
-                                         title="Add Head After">
-                                         <i class="mdi mdi-plus-circle"></i>
-                                     </button>
-                                 <?php endif; ?>
+                                    <!-- Add Row and Head Buttons -->
+                                    <?php if(config('visibility.bill_mode') == 'editing'): ?>
+                                        <button type="button"
+                                            class="add-row-after btn btn-outline-success btn-circle btn-sm"
+                                            title="Add Row After">
+                                            <i class="mdi mdi-plus-circle-outline"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="add-head-after btn btn-outline-primary btn-circle btn-sm"
+                                            title="Add Head After">
+                                            <i class="mdi mdi-plus-circle"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <textarea name="description[]" rows="5" class="form-control description-input" autocomplete="off"><?php echo e($data->description); ?></textarea>
@@ -152,7 +150,7 @@
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                 </td>
-                                <td><input type="hidden" name="qty[]" value="<?php echo e($data->qty); ?>"
+                                <td><input type="text" name="qty[]" value="<?php echo e($data->qty); ?>"
                                         class="form-control qty-input" min="1" style="width: 70px;" /></td>
                                 <td><input type="hidden" name="labour[]" value="<?php echo e($data->labour); ?>"
                                         class="form-control rate-input humara-class a" style="width: 70px;" /></td>
@@ -160,9 +158,11 @@
                                         class="form-control rate-input humara-class b" style="width: 70px;" /></td>
                                 <td><input type="hidden" name="misc[]" value="<?php echo e($data->misc); ?>"
                                         class="form-control rate-input humara-class c" style="width: 70px;" /></td>
-                                <td><input type="hidden" name="wastage_percent[]" value="<?php echo e($data->wastage_percent); ?>"
-                                        class="form-control rate-input d" style="width: 70px;" /></td>
-                                <td><input type="hidden" name="wastage_amount[]" value="<?php echo e($data->wastage_amount); ?>"
+                                <td><input type="hidden" name="wastage_percent[]"
+                                        value="<?php echo e($data->wastage_percent); ?>" class="form-control rate-input d"
+                                        style="width: 70px;" /></td>
+                                <td><input type="hidden" name="wastage_amount[]"
+                                        value="<?php echo e($data->wastage_amount); ?>"
                                         class="form-control rate-input humara-class e" style="width: 70px;" /></td>
                                 <td><input type="hidden" name="sc[]" value="<?php echo e($data->sc); ?>"
                                         class="form-control rate-input humara-class f" style="width: 70px;" /></td>
@@ -362,8 +362,8 @@
 
         // Delete Row
         $('#preliminaries-table-body').on('click', '.delete-row-btn', function() {
-        $(this).closest('tr').remove();
-    });
+            $(this).closest('tr').remove();
+        });
         // Function to generate row/head template
         function getRowTemplate(type, uomOptions) {
             const isHead = type === 'head';
@@ -393,7 +393,8 @@
                         ${uomOptions}
                     </select>
                 </td>
-                <td><input type="${inputType}" name="qty[]" value="" class="form-control qty-input" min="1" style="width: 70px;" /></td>
+                <td><input type="text" name="qty[]" value="" class="form-control qty-input" min="1" style="width: 70px;" /></td>
+
                 <td><input type="${inputType}" name="labour[]" value="" class="a form-control rate-input humara-class" style="width: 70px;" /></td>
                 <td><input type="${inputType}" name="material[]" value="" class="b form-control rate-input humara-class" style="width: 70px;" /></td>
                 <td><input type="${inputType}" name="misc[]" value="" class="c form-control rate-input humara-class" style="width: 70px;" /></td>
@@ -413,6 +414,7 @@
         }
 
 
-  
-});
-</script><?php /**PATH C:\xampp\htdocs\orion\application\resources\views/pages/bill/components/elements/templates/preliminaries.blade.php ENDPATH**/ ?>
+
+    });
+</script>
+<?php /**PATH C:\xampp\htdocs\orion\application\resources\views/pages/bill/components/elements/templates/preliminaries.blade.php ENDPATH**/ ?>

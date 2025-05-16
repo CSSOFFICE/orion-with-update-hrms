@@ -222,6 +222,9 @@
         content: "*";
         color: red;
     }
+        body {
+        font-weight: bold !important;
+    }
     </style>
 
     <!--SET DYNAMIC VARIABLE IN JAVASCRIPT-->

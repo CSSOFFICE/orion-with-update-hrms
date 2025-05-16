@@ -1,3 +1,8 @@
+<style>
+    body {
+            font-weight: bold !important;
+        }
+</style>
 <?php
 $session = $this->session->userdata('username');
 $theme = $this->Xin_model->read_theme_info(1);

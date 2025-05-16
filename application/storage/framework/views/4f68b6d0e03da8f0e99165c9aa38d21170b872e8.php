@@ -91,16 +91,16 @@
             <?php echo e('Schedule of Works'); ?>
 
             <?php elseif($option == 'plumbing_sanity'): ?>
-            <?php echo e('Plumbing & Sanity'); ?>
+            <?php echo e('Plumbing & Sanitary'); ?>
 
             <?php elseif($option == 'elec_acme'): ?>
-            <?php echo e('Elec & Acme'); ?>
+            <?php echo e('Electrical & ACMV'); ?>
 
             <?php elseif($option == 'external_works'): ?>
             <?php echo e('External Works'); ?>
 
             <?php elseif($option == 'pc_ps_sums'): ?>
-            <?php echo e('Pc & Ps Sums'); ?>
+            <?php echo e('PC & PS Sums'); ?>
 
             <?php elseif($option == 'others'): ?>
             <?php echo e('Others'); ?>

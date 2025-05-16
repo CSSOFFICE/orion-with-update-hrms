@@ -102,13 +102,53 @@ span {
             <tr>
                 <td><?php echo $this->lang->line('left_performance');?></td>
                 <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
-                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-performance" <?php if($module_performance=='yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-performance" <?php if($module_performance =='yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
             </tr>		
             <tr>
-                <td>Pro Rated Leave</td>
-                <td>You can set Pro rated Leave of Employee</td>
-                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-leave" <?php if($module_prorated_leave=='yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
-            </tr>					
+                <td><?php echo $this->lang->line('xin_hr_sales');?></td>
+                <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-sales" <?php if($module_sales == 'yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+            </tr>
+            <tr>
+                <td><?php echo $this->lang->line('xin_purchase');?></td>
+                <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-purchase" <?php if($module_purchase =='yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+            </tr>		
+            <tr>
+                <td><?php echo $this->lang->line('xin_purchase_requistion');?></td>
+                <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-purchase_requistion" <?php if($module_purchase_requistion =='yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+            </tr>
+            <tr>
+                <td><?php echo $this->lang->line('xin_purchase_order');?></td>
+                <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-purchase_order" <?php if($module_purchase_order =='yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+            </tr>
+            <tr>
+                <td><?php echo $this->lang->line('xin_suppliers');?></td>
+                <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-suppliers" <?php if($module_supplier == 'yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+            </tr>	
+            <tr>
+                <td><?php echo $this->lang->line('xin_hr_quotation');?></td>
+                <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-quotation" <?php if($module_quotation == 'yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+            </tr>	 
+            <tr>
+                <td><?php echo $this->lang->line('xin_invoices_title');?></td>
+                <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-invoice" <?php if($module_invoice == 'yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+            </tr>				
+            <tr>
+                <td><?php echo $this->lang->line('xin_vms');?></td>
+                <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-vms" <?php if($module_vms == 'yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+            </tr>	
+            <tr>
+                <td><?php echo $this->lang->line('xin_overtime_request');?></td>
+                <td><?php echo sprintf($this->lang->line('xin_setting_module_performance_details'),$company[0]->company_name);?></td>
+                <td><input data-group-cls="btn-group-sm" type="checkbox" class="js-switch switch" id="m-overtime_request" <?php if($module_overtime_request == 'yes'):?> checked="checked" <?php endif;?> value="yes" /></td>
+            </tr>			
         </tbody>
       </table>
       <?php echo form_close(); ?> </div>

@@ -7,7 +7,7 @@
 <?php $get_animate = $this->Xin_model->get_content_animate();?>
 
 <div class="row match-heights">
-  <div class="col-lg-8 col-md-8 current-tab <?php echo $get_animate;?>" id="general"  aria-expanded="false">
+  <div class="col-md-12 current-tab <?php echo $get_animate;?>" id="general"  aria-expanded="false">
     <?php $attributes = array('name' => 'payment_gateway', 'id' => 'payment_gateway', 'autocomplete' => 'off');?>
     <?php $hidden = array('u_company_info' => 'UPDATE');?>
     <?php echo form_open('admin/settings/update_payment_gateway/996633', $attributes, $hidden);?>

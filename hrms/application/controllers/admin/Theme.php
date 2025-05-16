@@ -90,7 +90,7 @@ class Theme extends MY_Controller
 		if(in_array('94',$role_resources_ids)) {
 			if(!empty($session)){ 
 				$data['subview'] = $this->load->view("admin/theme/theme_settings", $data, TRUE);
-				$this->load->view('admin/layout/pms/layout_pms', $data);; //page load
+				$this->load->view('admin/layout/pms/layout_pms', $data); //page load
 			} else {
 				redirect('admin/');
 			}
@@ -458,26 +458,14 @@ class Theme extends MY_Controller
 				$set_img = base_url()."uploads/logo/payroll/";
 				// basename() may prevent filesystem traversal attacks;
 				// further validation/sanitation of the filename may be appropriate
-				$system = $this->Xin_model->read_setting_info(1);		
 				$name = basename($_FILES["p_file5"]["name"]);
-				// $newfilename = 'payroll_logo_'.round(microtime(true)).'.'.$ext;
-				$newfilename = $system[0]->payroll_logo;
+				$newfilename = 'payroll_logo_'.round(microtime(true)).'.'.$ext;
 				move_uploaded_file($tmp_name, $profile.$newfilename);
-
-				$tc_new_path = 'application/libraries/tcpdf/examples/images/';
-				copy($profile.$newfilename, $tc_new_path.$newfilename);
-	
 				$fname = $newfilename;			
 				
 				$data = array(
 				'payroll_logo' => $fname
 				);
-				$system = $this->Xin_model->read_setting_info(1);	
-				// if(!empty($system[0]->payroll_logo)){	
-				// 	unlink('uploads/logo/payroll/'.$system[0]->payroll_logo);
-				// 	unlink('application/libraries/tcpdf/examples/images/'.$system[0]->payroll_logo);
-				// }
-
 				$result = $this->Xin_model->update_setting_info_record($data,$id);	
 				if ($result == TRUE) {
 					$Return['img'] = $set_img.$fname;

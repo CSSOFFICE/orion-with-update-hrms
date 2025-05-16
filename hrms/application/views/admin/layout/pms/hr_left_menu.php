@@ -1,3 +1,5 @@
+
+        
 <?php
 $session = $this->session->userdata('username');
 $user_info = $this->Xin_model->read_user_info($session['user_id']);

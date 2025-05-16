@@ -1,5 +1,6 @@
 <?php
- /**
+
+/**
  * NOTICE OF LICENSE
  *
  * This source file is subject to the HRSALE License
@@ -14,42 +15,47 @@
  * @author-email  hrsalesoft@gmail.com
  * @copyright  Copyright © hrsale.com. All Rights Reserved
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Settings extends MY_Controller {
-	
-	 public function __construct() {
-        parent::__construct();
+class Settings extends MY_Controller
+{
+
+	public function __construct()
+	{
+		parent::__construct();
 		//load the model
+		$this->load->library('upload');
 		$this->load->model("Employee_exit_model");
 		$this->load->model("Xin_model");
 		$this->load->model("Employees_model");
 		$this->load->model("Finance_model");
 		$this->load->helper('string');
 	}
-	
+
 	/*Function to set JSON output*/
-	public function output($Return=array()){
+	public function output($Return = array())
+	{
 		/*Set response header*/
 		header("Access-Control-Allow-Origin: *");
 		header("Content-Type: application/json; charset=UTF-8");
 		/*Final JSON response*/
 		exit(json_encode($Return));
 	}
-	
-	 public function index()
-     {	
+
+	public function index()
+	{
 
 		$session = $this->session->userdata('username');
-		if(empty($session)){ 
+		if (empty($session)) {
 			redirect('admin/');
 		}
-		$data['title'] = $this->lang->line('left_settings').' | '.$this->Xin_model->site_title();
+		$data['title'] = $this->lang->line('left_settings') . ' | ' . $this->Xin_model->site_title();
 		$setting = $this->Xin_model->read_setting_info(1);
 		$company_info = $this->Xin_model->read_company_setting_info(1);
 		$email_config = $this->Xin_model->read_email_config_info(1);
+		$quote = $this->db->where('id', 1)->get('xin_quo')->result();
 		$data = array(
-			'title' => $this->lang->line('left_settings').' | '.$this->Xin_model->site_title(),
+			'title' => $this->lang->line('left_settings') . ' | ' . $this->Xin_model->site_title(),
 			'company_info_id' => $company_info[0]->company_info_id,
 			'logo' => $company_info[0]->logo,
 			'logo_second' => $company_info[0]->logo_second,
@@ -59,6 +65,17 @@ class Settings extends MY_Controller {
 			'payroll_logo' => $setting[0]->payroll_logo,
 			'is_payslip_password_generate' => $setting[0]->is_payslip_password_generate,
 			'payslip_password_format' => $setting[0]->payslip_password_format,
+			'invoice_reg' => $setting[0]->invoice_reg_no,
+			'invoice_gst' => $setting[0]->invoice_gst_no,
+			'invoice_logo' => $setting[0]->invoice_logo,
+			'invoice_address_logo' => $setting[0]->invoice_address_logo,
+			'logo1' => $quote[0]->logo1,
+			'logo2' => $quote[0]->logo2,
+			'logo3' => $quote[0]->logo3,
+			'logo4' => $quote[0]->logo4,
+			'logo5' => $quote[0]->logo5,
+			'logo6' => $quote[0]->logo6,
+			'logo7' => $quote[0]->logo7,
 			'company_name' => $company_info[0]->company_name,
 			'contact_person' => $company_info[0]->contact_person,
 			'website_url' => $company_info[0]->website_url,
@@ -77,6 +94,7 @@ class Settings extends MY_Controller {
 			'application_name' => $setting[0]->application_name,
 			'default_currency_symbol' => $setting[0]->default_currency_symbol,
 			'show_currency' => $setting[0]->show_currency,
+			'd_gst' => $setting[0]->d_gst,
 			'currency_position' => $setting[0]->currency_position,
 			'date_format_xi' => $setting[0]->date_format_xi,
 			'animation_effect' => $setting[0]->animation_effect,
@@ -123,34 +141,38 @@ class Settings extends MY_Controller {
 			'statutory_fixed' => $setting[0]->statutory_fixed,
 			'estimate_terms_condition' => $setting[0]->estimate_terms_condition,
 			'invoice_terms_condition' => $setting[0]->invoice_terms_condition,
-			'all_countries' => $this->Xin_model->get_countries()
-			);
+			'all_countries' => $this->Xin_model->get_countries(),
+			''
+		);
+
+
+
 		$data['breadcrumbs'] = $this->lang->line('left_settings');
 		$data['path_url'] = 'settings';
 		$role_resources_ids = $this->Xin_model->user_role_resource();
-		if(in_array('60',$role_resources_ids)) {
-			if(!empty($session)){ 
+		if (in_array('60', $role_resources_ids)) {
+			if (!empty($session)) {
 				$data['subview'] = $this->load->view("admin/settings/settings", $data, TRUE);
-				$this->load->view('admin/layout/pms/layout_pms', $data);; //page load
+				$this->load->view('admin/layout/pms/layout_pms', $data); //page load
 			} else {
 				redirect('admin/');
 			}
 		} else {
 			redirect('admin/dashboard');
 		}
-     }
-	 	 
-	  public function payment_gateway()
-     {	
+	}
+
+	public function payment_gateway()
+	{
 
 		$session = $this->session->userdata('username');
-		if(empty($session)){ 
+		if (empty($session)) {
 			redirect('admin/');
 		}
-		$data['title'] = $this->lang->line('xin_acc_payment_gateway').' | '.$this->Xin_model->site_title();
+		$data['title'] = $this->lang->line('xin_acc_payment_gateway') . ' | ' . $this->Xin_model->site_title();
 		$setting = $this->Xin_model->read_setting_info(1);
 		$data = array(
-			'title' => $this->lang->line('xin_acc_payment_gateway').' | '.$this->Xin_model->site_title(),
+			'title' => $this->lang->line('xin_acc_payment_gateway') . ' | ' . $this->Xin_model->site_title(),
 			'paypal_email' => $setting[0]->paypal_email,
 			'paypal_sandbox' => $setting[0]->paypal_sandbox,
 			'paypal_active' => $setting[0]->paypal_active,
@@ -159,58 +181,58 @@ class Settings extends MY_Controller {
 			'stripe_active' => $setting[0]->stripe_active,
 			'online_payment_account' => $setting[0]->online_payment_account,
 			'all_bank_cash' => $this->Finance_model->all_bank_cash()
-			);
+		);
 		$data['breadcrumbs'] = $this->lang->line('xin_acc_payment_gateway');
 		$data['path_url'] = 'xin_payment_gateway';
 		$role_resources_ids = $this->Xin_model->user_role_resource();
-		if(in_array('118',$role_resources_ids)) {
-			if(!empty($session)){ 
+		if (in_array('118', $role_resources_ids)) {
+			if (!empty($session)) {
 				$data['subview'] = $this->load->view("admin/settings/payment_gateway_settings", $data, TRUE);
-				$this->load->view('admin/layout/pms/layout_pms', $data);; //page load
+				$this->load->view('admin/layout/pms/layout_pms', $data); //page load
 			} else {
 				redirect('admin/');
 			}
 		} else {
 			redirect('admin/dashboard');
 		}
-     }
-	 // database backup
-	 public function database_backup()
-     {
+	}
+	// database backup
+	public function database_backup()
+	{
 		$session = $this->session->userdata('username');
-		if(empty($session)){ 
+		if (empty($session)) {
 			redirect('admin/');
 		}
-		$data['title'] = $this->lang->line('left_db_backup').' | '.$this->Xin_model->site_title();
+		$data['title'] = $this->lang->line('left_db_backup') . ' | ' . $this->Xin_model->site_title();
 		$setting = $this->Xin_model->read_setting_info(1);
 		$company_info = $this->Xin_model->read_company_setting_info(1);
 		$data['breadcrumbs'] = $this->lang->line('left_db_backup');
 		$data['path_url'] = 'database_backup';
 		$role_resources_ids = $this->Xin_model->user_role_resource();
-		if(in_array('62',$role_resources_ids)) {
-			if(!empty($session)){ 
+		if (in_array('62', $role_resources_ids)) {
+			if (!empty($session)) {
 				$data['subview'] = $this->load->view("admin/settings/database_backup", $data, TRUE);
-				$this->load->view('admin/layout/pms/layout_pms', $data);; //page load
+				$this->load->view('admin/layout/pms/layout_pms', $data); //page load
 			} else {
 				redirect('admin/');
 			}
 		} else {
 			redirect('admin/dashboard');
 		}
-     }
-	 	 
-	 // system modules
-	 public function modules()
-     {
+	}
+
+	// system modules
+	public function modules()
+	{
 		$session = $this->session->userdata('username');
-		if(empty($session)){ 
+		if (empty($session)) {
 			redirect('admin/');
 		}
 		$setting = $this->Xin_model->read_setting_info(1);
 		$data['breadcrumbs'] = $this->lang->line('xin_modules');
 		$data['path_url'] = 'modules_setup';
 		$data = array(
-			'title' => $this->lang->line('xin_modules').' | '.$this->Xin_model->site_title(),
+			'title' => $this->lang->line('xin_modules') . ' | ' . $this->Xin_model->site_title(),
 			'path_url' => 'modules_setup',
 			'breadcrumbs' => $this->lang->line('xin_modules'),
 			'module_recruitment' => $setting[0]->module_recruitment,
@@ -228,138 +250,148 @@ class Settings extends MY_Controller {
 			'module_assets' => $setting[0]->module_assets,
 			'module_payroll' => $setting[0]->module_payroll,
 			'module_chat_box' => $setting[0]->module_chat_box,
-			'module_prorated_leave' => $setting[0]->module_prorated_leave,
+			'module_sales' => $setting[0]->module_sales,
+			'module_purchase' => $setting[0]->module_purchase,
+			'module_purchase_requistion' => $setting[0]->module_purchase_requistion,
+			'module_purchase_order' => $setting[0]->module_purchase_order,
+			'module_supplier' => $setting[0]->module_supplier,
+			'module_quotation' => $setting[0]->module_quotation,
+			'module_invoice' => $setting[0]->module_invoice,
+			'module_vms' => $setting[0]->module_vms,
+			'module_overtime_request' => $setting[0]->module_overtime_request,
+
 			'is_active_sub_departments' => $setting[0]->is_active_sub_departments,
-			);
+		);
 		$role_resources_ids = $this->Xin_model->user_role_resource();
-		if(in_array('93',$role_resources_ids)) {	
-			if(!empty($session)){ 
+		if (in_array('93', $role_resources_ids)) {
+			if (!empty($session)) {
 				$data['subview'] = $this->load->view("admin/settings/modules", $data, TRUE);
-				$this->load->view('admin/layout/pms/layout_pms', $data);; //page load
+				$this->load->view('admin/layout/pms/layout_pms', $data); //page load
 			} else {
 				redirect('admin/');
 			}
 		} else {
 			redirect('admin/dashboard');
 		}
-     }
-	  
-	 public function backup_database( $directory, $outname , $dbhost, $dbuser, $dbpass ,$dbname ) {
-	  
+	}
+
+	public function backup_database($directory, $outname, $dbhost, $dbuser, $dbpass, $dbname)
+	{
+
 		// check mysqli extension installed
-		if( ! function_exists('mysqli_connect') ) {
-		die(' This scripts need mysql extension to be running properly ! please resolve!!');
+		if (!function_exists('mysqli_connect')) {
+			die(' This scripts need mysql extension to be running properly ! please resolve!!');
 		}
 		$mysqli = @new mysqli($dbhost, $dbuser, $dbpass, $dbname);
-		
-		if( $mysqli->connect_error ) {
-			print_r( $mysqli->connect_error );
+
+		if ($mysqli->connect_error) {
+			print_r($mysqli->connect_error);
 			return false;
 		}
 		$dir = $directory;
-		$result = '<p> Could not create backup directory on :'.$dir.' Please Please make sure you have set Directory on 755 or 777 for a while.</p>';  
+		$result = '<p> Could not create backup directory on :' . $dir . ' Please Please make sure you have set Directory on 755 or 777 for a while.</p>';
 		$res = true;
-		if( ! is_dir( $dir ) ) {
-		  if( ! @mkdir( $dir, 755 )) {
-			$res = false;
-		  }
+		if (!is_dir($dir)) {
+			if (!@mkdir($dir, 755)) {
+				$res = false;
+			}
 		}
 		$n = 1;
-		if( $res ) {
-		$name     = $outname;
-		# counts
-		if( file_exists($dir.'/'.$name.'.sql.gz' ) ) {
-		  for($i=1;@count( file($dir.'/'.$name.'_'.$i.'.sql.gz') );$i++){
-			$name = $name;
-			if( ! file_exists( $dir.'/'.$name.'_'.$i.'.sql.gz') ) {
-			  $name = $name.'_'.$i;
-			  break;
+		if ($res) {
+			$name     = $outname;
+			# counts
+			if (file_exists($dir . '/' . $name . '.sql.gz')) {
+				for ($i = 1; @count(file($dir . '/' . $name . '_' . $i . '.sql.gz')); $i++) {
+					$name = $name;
+					if (!file_exists($dir . '/' . $name . '_' . $i . '.sql.gz')) {
+						$name = $name . '_' . $i;
+						break;
+					}
+				}
 			}
-		  }
-		}
-		$fullname = $dir.'/'.$name.'.sql.gz'; # full structures
-		if( ! $mysqli->error ) {
-		  $sql = "SHOW TABLES";
-		  $show = $mysqli->query($sql);
-		  while ( $r = $show->fetch_array() ) {
-			$tables[] = $r[0];
-		  }
-		  if( ! empty( $tables ) ) {
-		//cycle through
-		$return = '';
-		foreach( $tables as $table )
-		{
-		$result     = $mysqli->query('SELECT * FROM '.$table);
-		$num_fields = $result->field_count;
-		$row2       = $mysqli->query('SHOW CREATE TABLE '.$table );
-		$row2       = $row2->fetch_row();
-		$return    .= 
-		"\n
+			$fullname = $dir . '/' . $name . '.sql.gz'; # full structures
+			if (!$mysqli->error) {
+				$sql = "SHOW TABLES";
+				$show = $mysqli->query($sql);
+				while ($r = $show->fetch_array()) {
+					$tables[] = $r[0];
+				}
+				if (!empty($tables)) {
+					//cycle through
+					$return = '';
+					foreach ($tables as $table) {
+						$result     = $mysqli->query('SELECT * FROM ' . $table);
+						$num_fields = $result->field_count;
+						$row2       = $mysqli->query('SHOW CREATE TABLE ' . $table);
+						$row2       = $row2->fetch_row();
+						$return    .=
+							"\n
 		-- ---------------------------------------------------------
 		--
 		-- Table structure for table : `{$table}`
 		--
 		-- ---------------------------------------------------------
-		".$row2[1].";\n";
-		for ($i = 0; $i < $num_fields; $i++) 
-		{
-		  $n = 1 ;
-		  while( $row = $result->fetch_row() )
-		  { 
-			
-			if( $n++ == 1 ) { # set the first statements
-			  $return .= 
-		"
+		" . $row2[1] . ";\n";
+						for ($i = 0; $i < $num_fields; $i++) {
+							$n = 1;
+							while ($row = $result->fetch_row()) {
+
+								if ($n++ == 1) { # set the first statements
+									$return .=
+										"
 		--
 		-- Dumping data for table `{$table}`
 		--
-		";  
-			/**
-			 * Get structural of fields each tables
-			 */
-			$array_field = array(); #reset ! important to resetting when loop 
-			 while( $field = $result->fetch_field() ) # get field
-			{
-			  $array_field[] = '`'.$field->name.'`';
-			  
-			}
-			$array_f[$table] = $array_field;
-			// $array_f = $array_f;
-			# endwhile
-			$array_field = implode(', ', $array_f[$table]); #implode arrays
-			  $return .= "INSERT INTO `{$table}` ({$array_field}) VALUES\n(";
-			} else {
-			  $return .= '(';
-			}
-			for($j=0; $j<$num_fields; $j++) 
-			{
-			  
-			  $row[$j] = str_replace('\'','\'\'', preg_replace("/\n/","\\n", $row[$j] ) );
-			  if ( isset( $row[$j] ) ) { $return .= is_numeric( $row[$j] ) ? $row[$j] : '\''.$row[$j].'\'' ; } else { $return.= '\'\''; }
-			  if ($j<($num_fields-1)) { $return.= ', '; }
-			}
-			  $return.= "),\n";
-		  }
-		  # check matching
-		  @preg_match("/\),\n/", $return, $match, false, -3); # check match
-		  if( isset( $match[0] ) )
-		  {
-			$return = substr_replace( $return, ";\n", -2);
-		  }
-		}
-		
-		  $return .= "\n";
-		}
-		$return = 
-		"-- ---------------------------------------------------------
+		";
+									/**
+									 * Get structural of fields each tables
+									 */
+									$array_field = array(); #reset ! important to resetting when loop 
+									while ($field = $result->fetch_field()) # get field
+									{
+										$array_field[] = '`' . $field->name . '`';
+									}
+									$array_f[$table] = $array_field;
+									// $array_f = $array_f;
+									# endwhile
+									$array_field = implode(', ', $array_f[$table]); #implode arrays
+									$return .= "INSERT INTO `{$table}` ({$array_field}) VALUES\n(";
+								} else {
+									$return .= '(';
+								}
+								for ($j = 0; $j < $num_fields; $j++) {
+
+									//   $row[$j] = str_replace('\'','\'\'', preg_replace("/\n/","\\n", $row[$j] ) );
+									if (isset($row[$j])) {
+										$return .= is_numeric($row[$j]) ? $row[$j] : '\'' . $row[$j] . '\'';
+									} else {
+										$return .= '\'\'';
+									}
+									if ($j < ($num_fields - 1)) {
+										$return .= ', ';
+									}
+								}
+								$return .= "),\n";
+							}
+							# check matching
+							@preg_match("/\),\n/", $return, $match, false, -3); # check match
+							if (isset($match[0])) {
+								$return = substr_replace($return, ";\n", -2);
+							}
+						}
+
+						$return .= "\n";
+					}
+					$return =
+						"-- ---------------------------------------------------------
 		--
 		-- SIMPLE SQL Dump
 		-- 
 		-- nawa (at) yahoo (dot) com
 		--
-		-- Host Connection Info: ".$mysqli->host_info."
-		-- Generation Time: ".date('F d, Y \a\t H:i A ( e )')."
-		-- PHP Version: ".PHP_VERSION."
+		-- Host Connection Info: " . $mysqli->host_info . "
+		-- Generation Time: " . date('F d, Y \a\t H:i A ( e )') . "
+		-- PHP Version: " . PHP_VERSION . "
 		--
 		-- ---------------------------------------------------------\n\n
 		SET SQL_MODE = \"NO_AUTO_VALUE_ON_ZERO\";
@@ -368,58 +400,57 @@ class Settings extends MY_Controller {
 		/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 		/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 		/*!40101 SET NAMES utf8 */;
-		".$return."
+		" . $return . "
 		/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 		/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 		/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;";
-		# end values result
-		@ini_set('zlib.output_compression','Off');
+					# end values result
+					@ini_set('zlib.output_compression', 'Off');
 
-		$gzipoutput = gzencode( $return, 9);
-		if(  @ file_put_contents( $fullname, $gzipoutput  ) ) { # 9 as compression levels
-		
-		$result = $name.'.sql.gz'; # show the name
-		
-		} else { # if could not put file , automaticly you will get the file as downloadable
-		$result = false;   
-		// various headers, those with # are mandatory
-		header('Content-Type: application/x-gzip'); // change it to mimetype
-		header("Content-Description: File Transfer");
-		header('Content-Encoding: gzip'); #
-		header('Content-Length: '.strlen( $gzipoutput ) ); #
-		header('Content-Disposition: attachment; filename="'.$name.'.sql.gz'.'"');
-		header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
-		header('Connection: Keep-Alive');
-		header("Content-Transfer-Encoding: binary");
-		header('Expires: 0');
-		header('Pragma: no-cache');
-		
-		echo $gzipoutput;
-		}
-		   } else {
-			 $result = '<p>Error when executing database query to export.</p>'.$mysqli->error;
-		   
-		   }
-		 }
+					$gzipoutput = gzencode($return, 9);
+					if (@file_put_contents($fullname, $gzipoutput)) { # 9 as compression levels
+
+						$result = $name . '.sql.gz'; # show the name
+
+					} else { # if could not put file , automaticly you will get the file as downloadable
+						$result = false;
+						// various headers, those with # are mandatory
+						header('Content-Type: application/x-gzip'); // change it to mimetype
+						header("Content-Description: File Transfer");
+						header('Content-Encoding: gzip'); #
+						header('Content-Length: ' . strlen($gzipoutput)); #
+						header('Content-Disposition: attachment; filename="' . $name . '.sql.gz' . '"');
+						header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
+						header('Connection: Keep-Alive');
+						header("Content-Transfer-Encoding: binary");
+						header('Expires: 0');
+						header('Pragma: no-cache');
+
+						echo $gzipoutput;
+					}
+				} else {
+					$result = '<p>Error when executing database query to export.</p>' . $mysqli->error;
+				}
+			}
 		} else {
-		  $result = '<p>Wrong mysqli input</p>';
+			$result = '<p>Wrong mysqli input</p>';
 		}
-		
-		if( $mysqli && ! $mysqli->error ) {
-		  @$mysqli->close();
+
+		if ($mysqli && !$mysqli->error) {
+			@$mysqli->close();
 		}
 		return $result;
-		}
-	 
-	 public function create_database_backup()
-     {
+	}
+
+	public function create_database_backup()
+	{
 		$data['title'] = $this->Xin_model->site_title();
-		if($this->input->post('type')==='backup') {
-			
+		if ($this->input->post('type') === 'backup') {
+
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
+
 			$db = array('default' => array());
 			// get db credentials
 			require 'application/config/database.php';
@@ -427,20 +458,20 @@ class Settings extends MY_Controller {
 			$username = $db['default']['username'];
 			$password = $db['default']['password'];
 			$database = $db['default']['database'];
-				
+
 			$dir  = 'uploads/dbbackup/'; // directory files
-			$name = 'backup_'.date('d-m-Y_H_i_s'); // name sql backup
-			$this->backup_database( $dir, $name, $hostname, $username, $password, $database); // execute
-					
-			$fname = $name.'.sql.gz';
-					
+			$name = 'backup_' . date('d-m-Y_H_i_s'); // name sql backup
+			$this->backup_database($dir, $name, $hostname, $username, $password, $database); // execute
+
+			$fname = $name . '.sql.gz';
+
 			$data = array(
-			'backup_file' => $fname,
-			'created_at' => date('d-m-Y H:i:s')
+				'backup_file' => $fname,
+				'created_at' => date('d-m-Y H:i:s')
 			);
-			
-			$result = $this->Xin_model->add_backup($data);	
-			
+
+			$result = $this->Xin_model->add_backup($data);
+
 			if ($result == TRUE) {
 				$Return['result'] = $this->lang->line('xin_database_backup_generated');
 			} else {
@@ -449,38 +480,38 @@ class Settings extends MY_Controller {
 			$this->output($Return);
 			exit;
 		}
-     }
-	 
-	 public function delete_db_backup()
-     {
-		if($this->input->post('type')==='delete_old_backup') {
-			
+	}
+
+	public function delete_db_backup()
+	{
+		if ($this->input->post('type') === 'delete_old_backup') {
+
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
+
 			/*Delete backup*/
 			$result = $this->Xin_model->delete_all_backup_record();
 			$baseurl = base_url();
 			$files = glob('uploads/dbbackup/*'); //get all file names
-			foreach($files as $file){
-				if(is_file($file))
-				unlink($file); //delete file
+			foreach ($files as $file) {
+				if (is_file($file))
+					unlink($file); //delete file
 			}
-			
+
 			$Return['result'] = $this->lang->line('xin_success_database_old_backup_deleted');
 			$this->output($Return);
 			exit;
 		}
-     }
-	 
-	 // backup list
-	  public function database_backup_list()
-     {
+	}
+
+	// backup list
+	public function database_backup_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/database_backup", $data);
 		} else {
 			redirect('admin/');
@@ -489,61 +520,63 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
+
 		$db_backup = $this->Xin_model->all_db_backup();
 
 		$data = array();
 
-        foreach($db_backup->result() as $r) {
-			
-			$created_at = $this->Xin_model->set_date_format($r->created_at);
-						 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_download').'"><a href="'.site_url().'admin/download?type=dbbackup&filename='.$r->backup_file.'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light"><span class="fa fa-download"></span></button></a></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->backup_id . '"><span class="fa fa-trash"></span></button></span>',
-			$r->backup_file,
-			$created_at
-		);
-      }
+		foreach ($db_backup->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $db_backup->num_rows(),
-			 "recordsFiltered" => $db_backup->num_rows(),
-			 "data" => $data
+			$created_at = $this->Xin_model->set_date_format($r->created_at);
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_download') . '"><a href="' . site_url() . 'admin/download?type=dbbackup&filename=' . $r->backup_file . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light"><span class="fa fa-download"></span></button></a></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->backup_id . '"><span class="fa fa-trash"></span></button></span>',
+				$r->backup_file,
+				$created_at
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $db_backup->num_rows(),
+			"recordsFiltered" => $db_backup->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-    }
-	 
-	public function email_template() {
-		
+
+		echo json_encode($output);
+		exit();
+	}
+
+	public function email_template()
+	{
+
 		$session = $this->session->userdata('username');
-		if(empty($session)){ 
+		if (empty($session)) {
 			redirect('admin/');
 		}
-		$data['title'] = $this->lang->line('left_email_templates').' | '.$this->Xin_model->site_title();
+		$data['title'] = $this->lang->line('left_email_templates') . ' | ' . $this->Xin_model->site_title();
 		$data['breadcrumbs'] = $this->lang->line('left_email_templates');
 		$data['path_url'] = 'email_template';
 		$role_resources_ids = $this->Xin_model->user_role_resource();
-		if(in_array('63',$role_resources_ids)) {
-			if(!empty($session)){ 
+		if (in_array('63', $role_resources_ids)) {
+			if (!empty($session)) {
 				$data['subview'] = $this->load->view("admin/settings/email_template", $data, TRUE);
-				$this->load->view('admin/layout/pms/layout_pms', $data);; //page load
+				$this->load->view('admin/layout/pms/layout_pms', $data); //page load
 			} else {
 				redirect('admin/');
 			}
 		} else {
 			redirect('admin/dashboard');
-		}		  
-     } 
-	
+		}
+	}
+
 	// email templates > list
-	  public function email_template_list()
-     {
+	public function email_template_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/email_template", $data);
 		} else {
 			redirect('admin/');
@@ -552,44 +585,45 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$email_template = $this->Xin_model->get_email_templates();
 
 		$data = array();
 
-        foreach($email_template->result() as $r) {
-			
-		if($r->status==1){
-			$status = '<span class="badge badge-pill badge-success">'.$this->lang->line('xin_employees_active').'</span>';
-		} else {
-			$status = '<span class="badge badge-pill badge-warning">'.$this->lang->line('xin_employees_inactive').'</span>';
-		}
-						 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light"  data-toggle="modal" data-target=".edit-modal-data"  data-template_id="'. $r->template_id . '"><span class="fa fa-pencil"></span></button></span>',
-			$r->name,
-			$r->subject,
-			$status
-		);
-      }
+		foreach ($email_template->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $email_template->num_rows(),
-			 "recordsFiltered" => $email_template->num_rows(),
-			 "data" => $data
+			if ($r->status == 1) {
+				$status = '<span class="badge badge-pill badge-success">' . $this->lang->line('xin_employees_active') . '</span>';
+			} else {
+				$status = '<span class="badge badge-pill badge-warning">' . $this->lang->line('xin_employees_inactive') . '</span>';
+			}
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light"  data-toggle="modal" data-target=".edit-modal-data"  data-template_id="' . $r->template_id . '"><span class="fa fa-pencil"></span></button></span>',
+				$r->name,
+				$r->subject,
+				$status
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $email_template->num_rows(),
+			"recordsFiltered" => $email_template->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     } 
-	 // security level type > list
-	  public function security_level_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+	// security level type > list
+	public function security_level_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -598,37 +632,36 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_security_level_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->type_id . '" data-field_type="security_level"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->type_id . '" data-token_type="security_level"><span class="fa fa-trash"></span></button></span>',
-			$r->name
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->type_id . '" data-field_type="security_level"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->type_id . '" data-token_type="security_level"><span class="fa fa-trash"></span></button></span>',
+				$r->name
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-      }
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
-		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-
-	 // claim type > list
-	 public function claim_type_list()
-     {
-
+		echo json_encode($output);
+		exit();
+	}
+	public function term_condition_list()
+	{
+		// echo "1";exit;
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -637,799 +670,1254 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
-		$constant = $this->Xin_model->get_claim_type();
+
+
+		$constant = $this->Xin_model->get_term_condition();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->claim_type_id . '" data-field_type="claim_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->claim_type_id . '" data-token_type="claim_type"><span class="fa fa-trash"></span></button></span>',
-			$r->name
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   	"draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->term_id . '" data-field_type="ed_term_condition"><span class="fa fa-pencil"></span></button></span>
+						 <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->term_id . '" data-token_type="term_condition_level"><span class="fa fa-trash"></span></button></span>',
+				$r->term_title
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
+
+		echo json_encode($output);
+		exit();
+	}
+
+	public function project_type_list()
+	{
+		// echo "1";exit;
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
+		}
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->db->get('xin_project_type');
+		// $this->Xin_model->get_term_condition();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->project_type_id  . '" data-field_type="ed_project_type"><span class="fa fa-pencil"></span></button></span>
+						<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->project_type_id  . '" data-token_type="project_type_level"><span class="fa fa-trash"></span></button></span>',
+				$r->project_type
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
+		);
+
+		echo json_encode($output);
+		exit();
+	}
+
+	public function purchase_purpose_type_info()
+	{
+		if ($this->input->post('type') == 'purpose_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('purpose_type') === '') {
+				$Return['error'] = "Purchase Type Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'purpose_title' => $this->input->post('purchase_type')
+			);
+			// print_r($data);exit;
+			// $result = $this->Xin_model->add_project_type($data);
+			$result = $this->db->insert('purchase_purpose', $data);
+			if ($result) {
+				$Return['result'] = "Purchase Purpose added Successfull";
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function purchase_type_list()
+	{
+		// echo "1";exit;
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
+		}
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->db->get('purchase_purpose');
+		// $this->Xin_model->get_term_condition();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->id  . '" data-field_type="ed_purchase_type"><span class="fa fa-pencil"></span></button></span>
+						<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->id  . '" data-token_type="purpose_level"><span class="fa fa-trash"></span></button></span>',
+				$r->purpose_title
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
+		);
+
+		echo json_encode($output);
+		exit();
+	}
+	public function delete_purpose_level()
+	{
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->db->delete('purchase_purpose', ['id' => $id]);
+
+			if (isset($id)) {
+				$Return['result'] = "Purchase Purpose Deleted Successfull";
+			} else {
+				$Return['error'] = "Something Went Wrong";
+			}
+			$this->output($Return);
+		}
+	}
+	public function delivery_time_info()
+	{
+		if ($this->input->post('type') == 'delivery_time_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('delivery_type') === '') {
+				$Return['error'] = "Delivery Week Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'delivery_time' => $this->input->post('delivery_type')
+			);
+			// print_r($data);exit;
+			// $result = $this->Xin_model->add_project_type($data);
+			$result = $this->db->insert('delivery_weeks', $data);
+			if ($result) {
+				$Return['result'] = "Delevery Week added Successfull";
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		} else {
+			echo "else part";
+		}
+	}
+
+	public function delivery_type_list()
+	{
+		// echo "1";exit;
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
+		}
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->db->get('delivery_weeks');
+		// $this->Xin_model->get_term_condition();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->id  . '" data-field_type="ed_delivery_type"><span class="fa fa-pencil"></span></button></span>
+						<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->id  . '" data-token_type="delivery_time"><span class="fa fa-trash"></span></button></span>',
+				$r->delivery_time
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
+		);
+
+		echo json_encode($output);
+		exit();
+	}
+
+
+	public function pay_type_info()
+	{
+		if ($this->input->post('type') == 'pay_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('delivery_type') === '') {
+				$Return['error'] = "Payment Method Required";
+			}
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'method_name' => $this->input->post('pay_type')
+			);
+			// print_r($data);exit;
+			// $result = $this->Xin_model->add_project_type($data);
+			$result = $this->db->insert('xin_payment_method', $data);
+			if ($result) {
+				$Return['result'] = "Payment Method Added Successfull";
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function Quotation_templets_add()
+	{
+		if ($this->input->post('type') == 'Quotation_templets') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('Category_name') === '') {
+				$Return['error'] = "Category_name Required";
+			}
+			if ($this->input->post('description_of_quotation') === '') {
+				$Return['error'] = "description_of_quotation Required";
+			}
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'category' => $this->input->post('Category_name'),
+				'description_name' => $this->input->post('description_of_quotation'),
+				'quotation_unit' => $this->input->post('quotation_unit'),
+			);
+			// print_r($data);exit;
+			// $result = $this->Xin_model->add_project_type($data);
+			$result = $this->db->insert('quotation_templet', $data);
+			if ($result) {
+				$Return['result'] = "Added Successfull";
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function Quotation_templets_update()
+	{
+		if ($this->input->post('type') == 'Quotation_templets_update') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = $this->uri->segment(4);
+			/* Server side PHP input validation */
+			if ($this->input->post('Category_name') === '') {
+				$Return['error'] = "Category_name Required";
+			}
+			if ($this->input->post('description_of_quotation') === '') {
+				$Return['error'] = "description_of_quotation Required";
+			}
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'category' => $this->input->post('Category_name'),
+				'description_name' => $this->input->post('description_of_quotation'),
+				'quotation_unit' => $this->input->post('quotation_unit'),
+			);
+			// print_r($data);exit;
+			// $result = $this->Xin_model->add_project_type($data);
+			$result = $this->db->where('id', $id)->update('quotation_templet', $data);
+			if ($result) {
+				$Return['result'] = "Updated Successfull";
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function delete_Quotation_templets()
+	{
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+		$id = $this->uri->segment(4);
+		$result = $this->db->where('id', $id)->delete('quotation_templet');
+		if ($result) {
+			$Return['result'] = "Successfull Deleted";
+		} else {
+			$Return['error'] = $this->lang->line('xin_error_msg');
+		}
+		$this->output($Return);
+		exit;
+	}
+	public function Quotation_templets_list()
+	{
+
+		// echo "1";exit;
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
+		}
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+		$categories = [
+			1 => "SUMMARY",
+			2 => "PRELIMINARIES",
+			3 => "INSURANCE",
+			4 => "SCHEDULE OF WORKS",
+			5 => "Plumbing & Sanitary",
+			6 => "ELEC & ACMV",
+			7 => "EXTERNAL WORKS",
+			8 => "PC & PS SUMS"
+		];
+
+
+		$constant = $this->db->get('quotation_templet');
+		// $this->Xin_model->get_term_condition();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+			$category_name = isset($categories[$r->category]) ? $categories[$r->category] : "Unknown Category";
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->id  . '" data-field_type="Quotation_templets"><span class="fa fa-pencil"></span></button></span>
+						<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->id  . '" data-token_type="Quotation_templets"><span class="fa fa-trash"></span></button></span>',
+				$category_name,
+				$r->quotation_unit,
+				$r->description_name,
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
+		);
+
+		echo json_encode($output);
+		exit();
+	}
+
+	public function pay_type_list()
+	{
+		// echo "1";exit;
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
+		}
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->db->get('xin_payment_method');
+		// $this->Xin_model->get_term_condition();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->payment_method_id  . '" data-field_type="ed_pay_type"><span class="fa fa-pencil"></span></button></span>
+						<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->payment_method_id  . '" data-token_type="pay_ty"><span class="fa fa-trash"></span></button></span>',
+				$r->method_name
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
+		);
+
+		echo json_encode($output);
+		exit();
+	}
+	public function delete_pay_ty()
+	{
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->db->delete('xin_payment_method', ['payment_method_id' => $id]);
+			if (isset($id)) {
+				$Return['result'] = "Payment Type Deleted";
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
 	public function read_tempalte()
 	{
 		$data['title'] = $this->Xin_model->site_title();
 		$id = $this->input->get('template_id');
 		$result = $this->Xin_model->read_email_template_info($id);
 		$data = array(
-				'template_id' => $result[0]->template_id,
-				'template_code' => $result[0]->template_code,
-				'name' => $result[0]->name,
-				'subject' => $result[0]->subject,
-				'message' => $result[0]->message,
-				'status' => $result[0]->status
-				);
+			'template_id' => $result[0]->template_id,
+			'template_code' => $result[0]->template_code,
+			'name' => $result[0]->name,
+			'subject' => $result[0]->subject,
+			'message' => $result[0]->message,
+			'status' => $result[0]->status
+		);
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view('admin/settings/dialog_email_template', $data);
 		} else {
 			redirect('admin/');
 		}
-	} 
-	
+	}
+
 	public function password_read()
 	{
 		$data['title'] = $this->Xin_model->site_title();
 		$id = $this->input->get('user_id');
 		$result = $this->Xin_model->read_user_info($id);
 		$data = array(
-				'user_id' => $result[0]->user_id,
-				);
+			'user_id' => $result[0]->user_id,
+		);
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view('admin/settings/dialog_constants', $data);
 		} else {
 			redirect('admin/');
 		}
-	} 
-	
+	}
+
+
 	public function policy_read()
 	{
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view('admin/settings/dialog_constants', $data);
 		} else {
 			redirect('admin/');
 		}
-	} 
-	
+	}
+
 	// Validate and update info in database
-	public function update_template() {
-	
-		if($this->input->post('edit_type')=='update_template') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$id = $this->uri->segment(4);
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		if($this->input->post('name')==='') {
-       		 $Return['error'] = $this->lang->line('xin_error_name_field');
-		} else if($this->input->post('subject')==='') {
-			$Return['error'] = $this->lang->line('xin_employee_error_subject');
-		} else if($this->input->post('status')==='') {
-			 $Return['error'] = $this->lang->line('xin_error_template_status');
-		} else if($this->input->post('message')==='') {
-			$Return['error'] = $this->lang->line('xin_project_message');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-		
-		$message = $this->input->post('message');
-		$new_message = htmlspecialchars(addslashes($message), ENT_QUOTES);
-	
-		$data = array(
-		'name' => $this->input->post('name'),
-		'subject' => $this->input->post('subject'),
-		'status' => $this->input->post('status'),
-		'message' => $new_message
-		);
-		
-		$result = $this->Xin_model->update_email_template_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_email_template_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function update_template()
+	{
+
+		if ($this->input->post('edit_type') == 'update_template') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_name_field');
+			} else if ($this->input->post('subject') === '') {
+				$Return['error'] = $this->lang->line('xin_employee_error_subject');
+			} else if ($this->input->post('status') === '') {
+				$Return['error'] = $this->lang->line('xin_error_template_status');
+			} else if ($this->input->post('message') === '') {
+				$Return['error'] = $this->lang->line('xin_project_message');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$message = $this->input->post('message');
+			$new_message = htmlspecialchars(addslashes($message), ENT_QUOTES);
+
+			$data = array(
+				'name' => $this->input->post('name'),
+				'subject' => $this->input->post('subject'),
+				'status' => $this->input->post('status'),
+				'message' => $new_message
+			);
+
+			$result = $this->Xin_model->update_email_template_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_email_template_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// get all constants > all types
 	public function constants()
-     {
+	{
 		$session = $this->session->userdata('username');
-		if(empty($session)){ 
+		if (empty($session)) {
 			redirect('admin/');
 		}
-		$data['title'] = $this->lang->line('left_constants').' | '.$this->Xin_model->site_title();
+		$data['title'] = $this->lang->line('left_constants') . ' | ' . $this->Xin_model->site_title();
 		//$setting = $this->Xin_model->read_setting_info(1);
 		$company_info = $this->Xin_model->read_company_setting_info(1);
 		$data['breadcrumbs'] = $this->lang->line('left_constants');
 		$data['all_companies'] = $this->Xin_model->get_companies();
 		$data['path_url'] = 'constants';
 		$role_resources_ids = $this->Xin_model->user_role_resource();
-		if(in_array('61',$role_resources_ids)) {
-			if(!empty($session)){ 
+		if (in_array('61', $role_resources_ids)) {
+			if (!empty($session)) {
 				$data['subview'] = $this->load->view("admin/settings/constants", $data, TRUE);
-				$this->load->view('admin/layout/pms/layout_pms', $data);; //page load
+				$this->load->view('admin/layout/pms/layout_pms', $data); //page load
 			} else {
 				redirect('admin/');
 			}
 		} else {
 			redirect('admin/dashboard');
 		}
-     }
-	 	
-	// Validate and update info in database
-	public function company_info() {
-	
-		if($this->input->post('type')=='company_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-		
-		if($this->input->post('company_name')==='') {
-       		 $Return['error'] = $this->lang->line('xin_employee_error_company_name');
-		} else if($this->input->post('website')==='') {
-			$Return['error'] = $this->lang->line('xin_error_website_field');
-		} else if($this->input->post('contact_person')==='') {
-			$Return['error'] = $this->lang->line('xin_error_contact_person');
-		} else if($this->input->post('email')==='') {
-			 $Return['error'] = $this->lang->line('xin_error_cemail_field');
-		} else if (!filter_var($this->input->post('email'), FILTER_VALIDATE_EMAIL)) {
-			$Return['error'] = $this->lang->line('xin_employee_error_invalid_email');
-		} else if($this->input->post('phone')==='') {
-			$Return['error'] = $this->lang->line('xin_error_phone_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'company_name' => $this->input->post('company_name'),
-		'contact_person' => $this->input->post('contact_person'),
-		'website_url' => $this->input->post('website'),
-		'starting_year' => $this->input->post('starting_year'),
-		'company_email' => $this->input->post('company_email'),
-		'company_contact' => $this->input->post('company_contact'),
-		'email' => $this->input->post('email'),
-		'phone' => $this->input->post('phone'),
-		'address_1' => $this->input->post('address_1'),
-		'address_2' => $this->input->post('address_2'),
-		'city' => $this->input->post('city'),
-		'state' => $this->input->post('state'),
-		'zipcode' => $this->input->post('zipcode'),
-		'country' => $this->input->post('country'),
-		);
-		
-		$result = $this->Xin_model->update_company_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_company_info_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
 	}
-	
-	// Validate and update info in database
-	public function logo_info() {
-	
-		if($this->input->post('type')=='logo_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-		
-		if($_FILES['p_file']['size'] == 0) {
-			$Return['error'] = $this->lang->line('xin_error_select_first_logo');
-		} 
-		
-		if($Return['error']!=''){
-				$this->output($Return);
-			}
-							
-		if(is_uploaded_file($_FILES['p_file']['tmp_name'])) {
-		//checking image type
-		$allowed =  array('png','jpg','jpeg','pdf','gif');
-		$filename = $_FILES['p_file']['name'];
-		$ext = pathinfo($filename, PATHINFO_EXTENSION);
-		
-		if(in_array($ext,$allowed)){
-			$tmp_name = $_FILES["p_file"]["tmp_name"];
-			$profile = "uploads/logo/";
-			$set_img = base_url()."uploads/logo/";
-			// basename() may prevent filesystem traversal attacks;
-			// further validation/sanitation of the filename may be appropriate
-			$name = basename($_FILES["p_file"]["name"]);
-			$newfilename = 'logo_'.round(microtime(true)).'.'.$ext;
-			move_uploaded_file($tmp_name, $profile.$newfilename);
-			$fname = $newfilename;			
-			
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_logo_first_attachment');
-			}
-		}	
-		
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'logo' => $fname,
-		);
-		$result = $this->Xin_model->update_company_info_record($data,$id);	
-		if ($result == TRUE) {
-			$Return['img'] = $set_img.$fname;
-			$Return['result'] = $this->lang->line('xin_success_system_logo_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
 
-		}
-	}
-	
 	// Validate and update info in database
-	public function logo_favicon() {
-	
-		if($this->input->post('type')=='logo_favicon') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-		
-		if($_FILES['favicon']['size'] == 0) {
-			$Return['error'] = $this->lang->line('xin_error_select_favicon');
-		}
-		if($Return['error']!=''){
-				$this->output($Return);
-		}
-									
-		if(is_uploaded_file($_FILES['favicon']['tmp_name'])) {
-		//checking image type
-		$allowed3 =  array('png','jpg','gif','ico');
-		$filename3 = $_FILES['favicon']['name'];
-		$ext3 = pathinfo($filename3, PATHINFO_EXTENSION);
-		
-		if(in_array($ext3,$allowed3)){
-			$tmp_name3 = $_FILES["favicon"]["tmp_name"];
-			$profile3 = "uploads/logo/favicon/";
-			$set_img3 = base_url()."uploads/logo/favicon/";
-			// basename() may prevent filesystem traversal attacks;
-			// further validation/sanitation of the filename may be appropriate
-			$name = basename($_FILES["favicon"]["name"]);
-			$newfilename3 = 'favicon_'.round(microtime(true)).'.'.$ext3;
-			move_uploaded_file($tmp_name3, $profile3.$newfilename3);
-			$fname3 = $newfilename3;			
-			
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_logo_favicon_attachment');
-			}
-		}
+	public function company_info()
+	{
 
-	
-		$data = array(
-		'favicon' => $fname3
-		);
-		$result = $this->Xin_model->update_company_info_record($data,$id);	
-		if ($result == TRUE) {
-			$Return['img3'] = $set_img3.$fname3;
-			$Return['result'] = $this->lang->line('xin_success_system_logo_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+		if ($this->input->post('type') == 'company_info') {
 
-		}
-	}
-	
-	// Validate and update info in database
-	public function profile_background() {
-	
-		if($this->input->post('type')=='profile_background') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			
-		$id = $this->input->post('user_id');
-		
-		if($_FILES['p_file']['size'] == 0) {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$Return['error'] = $this->lang->line('xin_error_select_profile_cover');
-		} else {
-		if(is_uploaded_file($_FILES['p_file']['tmp_name'])) {
-			//checking image type
-			$allowed =  array('png','jpg','jpeg','pdf','gif');
-			$filename = $_FILES['p_file']['name'];
-			$ext = pathinfo($filename, PATHINFO_EXTENSION);
-			
-			if(in_array($ext,$allowed)){
-				$tmp_name = $_FILES["p_file"]["tmp_name"];
-				$profile = "uploads/profile/background/";
-				$set_img = base_url()."uploads/profile/background/";
-				// basename() may prevent filesystem traversal attacks;
-				// further validation/sanitation of the filename may be appropriate
-				$name = basename($_FILES["p_file"]["name"]);
-				$newfilename = 'profile_background_'.round(microtime(true)).'.'.$ext;
-				move_uploaded_file($tmp_name, $profile.$newfilename);
-				$fname = $newfilename;			
-				
-				$data = array(
-				'profile_background' => $fname
-				);
-				$result = $this->Employees_model->basic_info($data,$id);	
-				if ($result == TRUE) {
-					$Return['profile_background'] = $set_img.$fname;
-					$Return['result'] = $this->lang->line('xin_success_profile_background_updated');
-				} else {
-					$Return['error'] = $this->lang->line('xin_error_msg');
-				}
-				$Return['csrf_hash'] = $this->security->get_csrf_hash();
-				$this->output($Return);
-				exit;	
-		
-			} else {
-				$Return['csrf_hash'] = $this->security->get_csrf_hash();
-				$Return['error'] = $this->lang->line('xin_error_attatchment_type');
-				}
+			$id = 1;
+
+			if ($this->input->post('company_name') === '') {
+				$Return['error'] = $this->lang->line('xin_employee_error_company_name');
+			} else if ($this->input->post('website') === '') {
+				$Return['error'] = $this->lang->line('xin_error_website_field');
+			} else if ($this->input->post('contact_person') === '') {
+				$Return['error'] = $this->lang->line('xin_error_contact_person');
+			} else if ($this->input->post('email') === '') {
+				$Return['error'] = $this->lang->line('xin_error_cemail_field');
+			} else if (!filter_var($this->input->post('email'), FILTER_VALIDATE_EMAIL)) {
+				$Return['error'] = $this->lang->line('xin_employee_error_invalid_email');
+			} else if ($this->input->post('phone') === '') {
+				$Return['error'] = $this->lang->line('xin_error_phone_field');
 			}
-		}
-				
-		if($Return['error']!=''){
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'company_name' => $this->input->post('company_name'),
+				'contact_person' => $this->input->post('contact_person'),
+				'website_url' => $this->input->post('website'),
+				'starting_year' => $this->input->post('starting_year'),
+				'company_email' => $this->input->post('company_email'),
+				'company_contact' => $this->input->post('company_contact'),
+				'email' => $this->input->post('email'),
+				'phone' => $this->input->post('phone'),
+				'address_1' => $this->input->post('address_1'),
+				'address_2' => $this->input->post('address_2'),
+				'city' => $this->input->post('city'),
+				'state' => $this->input->post('state'),
+				'zipcode' => $this->input->post('zipcode'),
+				'country' => $this->input->post('country'),
+			);
+
+			$result = $this->Xin_model->update_company_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_company_info_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
 			$this->output($Return);
-		}
+			exit;
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function payroll_config() {
-	
-		if($this->input->post('type')=='payroll_config') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-		
-		$data = array(
-		'is_payslip_password_generate' => $this->input->post('payslip_password_generate'),
-		'payslip_password_format' => $this->input->post('payslip_password_format'),
-		'is_half_monthly' => $this->input->post('is_half_monthly'),
-		'half_deduct_month' => $this->input->post('half_deduct_month')
-		);
-		$result = $this->Xin_model->update_setting_info_record($data,$id);	
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_payroll_config_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-				
-		if($Return['error']!=''){
-		$this->output($Return);
-		}
+	public function logo_info()
+	{
+
+		if ($this->input->post('type') == 'logo_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			if ($_FILES['p_file']['size'] == 0) {
+				$Return['error'] = $this->lang->line('xin_error_select_first_logo');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			if (is_uploaded_file($_FILES['p_file']['tmp_name'])) {
+				//checking image type
+				$allowed =  array('png', 'jpg', 'jpeg', 'pdf', 'gif');
+				$filename = $_FILES['p_file']['name'];
+				$ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+				if (in_array($ext, $allowed)) {
+					$tmp_name = $_FILES["p_file"]["tmp_name"];
+					$profile = "uploads/logo/";
+					$set_img = base_url() . "uploads/logo/";
+					// basename() may prevent filesystem traversal attacks;
+					// further validation/sanitation of the filename may be appropriate
+					$name = basename($_FILES["p_file"]["name"]);
+					$newfilename = 'logo_' . round(microtime(true)) . '.' . $ext;
+					move_uploaded_file($tmp_name, $profile . $newfilename);
+					$fname = $newfilename;
+				} else {
+					$Return['error'] = $this->lang->line('xin_error_logo_first_attachment');
+				}
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'logo' => $fname,
+			);
+			$result = $this->Xin_model->update_company_info_record($data, $id);
+			if ($result == TRUE) {
+				$Return['img'] = $set_img . $fname;
+				$Return['result'] = $this->lang->line('xin_success_system_logo_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function system_info() {
-	
-		if($this->input->post('type')=='system_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-		
-		if(trim($this->input->post('application_name'))==='') {
-       		 $Return['error'] = $this->lang->line('xin_error_application_name_field');
-		} else if($this->input->post('default_currency_symbol')==='') {
-			$Return['error'] = $this->lang->line('xin_error_default_currency_field');
-		} else if($this->input->post('show_currency')==='') {
-			$Return['error'] = $this->lang->line('xin_error_default_currency_symbol');
-		} else if($this->input->post('currency_position')==='') {
-			$Return['error'] = $this->lang->line('xin_error_currency_position');
-		} else if($this->input->post('date_format')==='') {
-			$Return['error'] = $this->lang->line('xin_error_date_format_field');
-		} else if($this->input->post('footer_text')==='') {
-			$Return['error'] = $this->lang->line('xin_error_footer_text');
-		} else if($this->input->post('employee_login_id')==='') {
-			$Return['error'] = $this->lang->line('xin_error_employee_login_id_field');
-		} else if($this->input->post('system_timezone')==='') {
-			$Return['error'] = $this->lang->line('xin_error_timezone_field');
-		} else if($this->input->post('system_ip_address')==='') {
-			$Return['error'] = $this->lang->line('xin_error_sys_ip_address_field');
-		} else if($this->input->post('google_maps_api_key')==='') {
-			$Return['error'] = $this->lang->line('xin_error_gmap_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-			'application_name' => $this->input->post('application_name'),
-			'default_currency_symbol' => $this->input->post('default_currency_symbol'),
-			'default_currency' => $this->input->post('default_currency_symbol'),
-			'show_currency' => $this->input->post('show_currency'),
-			'currency_position' => $this->input->post('currency_position'),
-			// 'date_format_xi' => $this->input->post('date_format'),
-			'footer_text' => $this->input->post('footer_text'),
-			'enable_page_rendered' => $this->input->post('enable_page_rendered'),
-			'enable_current_year' => $this->input->post('enable_current_year'),
-			'employee_login_id' => $this->input->post('employee_login_id'),
-			'enable_auth_background' => $this->input->post('enable_auth_background'),
-			'system_timezone' => $this->input->post('system_timezone'),
-			'google_maps_api_key' => $this->input->post('google_maps_api_key'),
-			'is_ssl_available' => $this->input->post('is_ssl_available'),
-			'default_language' => $this->input->post('default_language'),
-			'statutory_fixed' => $this->input->post('statutory_fixed'),
-			'invoice_terms_condition' => $this->input->post('invoice_terms_condition'),
-			'estimate_terms_condition' => $this->input->post('estimate_terms_condition'),
-			'staff_dashboard' => $this->input->post('staff_dashboard'),
-			'project_dashboard' => $this->input->post('project_dashboard'),
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_system_configuration_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function logo_favicon()
+	{
+
+		if ($this->input->post('type') == 'logo_favicon') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			if ($_FILES['favicon']['size'] == 0) {
+				$Return['error'] = $this->lang->line('xin_error_select_favicon');
+			}
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			if (is_uploaded_file($_FILES['favicon']['tmp_name'])) {
+				//checking image type
+				$allowed3 =  array('png', 'jpg', 'gif', 'ico');
+				$filename3 = $_FILES['favicon']['name'];
+				$ext3 = pathinfo($filename3, PATHINFO_EXTENSION);
+
+				if (in_array($ext3, $allowed3)) {
+					$tmp_name3 = $_FILES["favicon"]["tmp_name"];
+					$profile3 = "uploads/logo/favicon/";
+					$set_img3 = base_url() . "uploads/logo/favicon/";
+					// basename() may prevent filesystem traversal attacks;
+					// further validation/sanitation of the filename may be appropriate
+					$name = basename($_FILES["favicon"]["name"]);
+					$newfilename3 = 'favicon_' . round(microtime(true)) . '.' . $ext3;
+					move_uploaded_file($tmp_name3, $profile3 . $newfilename3);
+					$fname3 = $newfilename3;
+				} else {
+					$Return['error'] = $this->lang->line('xin_error_logo_favicon_attachment');
+				}
+			}
+
+
+			$data = array(
+				'favicon' => $fname3
+			);
+			$result = $this->Xin_model->update_company_info_record($data, $id);
+			if ($result == TRUE) {
+				$Return['img3'] = $set_img3 . $fname3;
+				$Return['result'] = $this->lang->line('xin_success_system_logo_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function modules_info() {
-	
-		if($this->input->get('type')=='modules_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-	
-		$data = array(
-		'module_recruitment' => $this->input->get('mrecruitment'),
-		'module_travel' => $this->input->get('mtravel'),
-		'module_files' => $this->input->get('mfiles'),
-		'module_language' => $this->input->get('mlanguage'),
-		'module_orgchart' => $this->input->get('morgchart'),
-		'module_events' => $this->input->get('mevents'),
-		'module_chat_box' => $this->input->get('chatbox'),
-		'is_active_sub_departments' => $this->input->get('is_sub_departments'),
-		'module_payroll' => $this->input->get('module_payroll'),
-		'module_performance' => $this->input->get('module_performance'),
-		'module_prorated_leave' => $this->input->get('module_prorated_leave'),
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_system_modules_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function profile_background()
+	{
+
+		if ($this->input->post('type') == 'profile_background') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+
+			$id = $this->input->post('user_id');
+
+			if ($_FILES['p_file']['size'] == 0) {
+				$Return['csrf_hash'] = $this->security->get_csrf_hash();
+				$Return['error'] = $this->lang->line('xin_error_select_profile_cover');
+			} else {
+				if (is_uploaded_file($_FILES['p_file']['tmp_name'])) {
+					//checking image type
+					$allowed =  array('png', 'jpg', 'jpeg', 'pdf', 'gif');
+					$filename = $_FILES['p_file']['name'];
+					$ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+					if (in_array($ext, $allowed)) {
+						$tmp_name = $_FILES["p_file"]["tmp_name"];
+						$profile = "uploads/profile/background/";
+						$set_img = base_url() . "uploads/profile/background/";
+						// basename() may prevent filesystem traversal attacks;
+						// further validation/sanitation of the filename may be appropriate
+						$name = basename($_FILES["p_file"]["name"]);
+						$newfilename = 'profile_background_' . round(microtime(true)) . '.' . $ext;
+						move_uploaded_file($tmp_name, $profile . $newfilename);
+						$fname = $newfilename;
+
+						$data = array(
+							'profile_background' => $fname
+						);
+						$result = $this->Employees_model->basic_info($data, $id);
+						if ($result == TRUE) {
+							$Return['profile_background'] = $set_img . $fname;
+							$Return['result'] = $this->lang->line('xin_success_profile_background_updated');
+						} else {
+							$Return['error'] = $this->lang->line('xin_error_msg');
+						}
+						$Return['csrf_hash'] = $this->security->get_csrf_hash();
+						$this->output($Return);
+						exit;
+					} else {
+						$Return['csrf_hash'] = $this->security->get_csrf_hash();
+						$Return['error'] = $this->lang->line('xin_error_attatchment_type');
+					}
+				}
+			}
+
+			if ($Return['error'] != '') {
+				$Return['csrf_hash'] = $this->security->get_csrf_hash();
+				$this->output($Return);
+			}
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function layout_skin_info() {
-	
-		if($this->input->get('type')=='hrsale_layout_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = $this->input->get('user_session_id');
-			
-		$data = array(
-		'fixed_header' => $this->input->get('fixed_layout_hrsale'),
-		'boxed_wrapper' => $this->input->get('boxed_layout_hrsale'),
-		'compact_sidebar' => $this->input->get('sidebar_layout_hrsale')
-		);
-		
-		$result = $this->Employees_model->basic_info($data,$id);	
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_system_layout_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function payroll_config()
+	{
+
+		if ($this->input->post('type') == 'payroll_config') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			$data = array(
+				'is_payslip_password_generate' => $this->input->post('payslip_password_generate'),
+				'payslip_password_format' => $this->input->post('payslip_password_format'),
+				'is_half_monthly' => $this->input->post('is_half_monthly'),
+				'half_deduct_month' => $this->input->post('half_deduct_month')
+			);
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_payroll_config_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function role_info() {
-	
-		if($this->input->post('type')=='role_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-			
-		$data = array(
-		'employee_manage_own_contact' => $this->input->post('employee_manage_own_contact'),
-		'employee_manage_own_social' => $this->input->post('employee_manage_own_social'),
-		'employee_manage_own_bank_account' => $this->input->post('employee_manage_own_bank_account'),
-		'employee_manage_own_qualification' => $this->input->post('employee_manage_own_qualification'),
-		'employee_manage_own_work_experience' => $this->input->post('employee_manage_own_work_experience'),
-		'employee_manage_own_document' => $this->input->post('employee_manage_own_document'),
-		'employee_manage_own_picture' => $this->input->post('employee_manage_own_picture'),
-		'employee_manage_own_profile' => $this->input->post('employee_manage_own_profile'),
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_role_config_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function system_info()
+	{
+
+		if ($this->input->post('type') == 'system_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			if (trim($this->input->post('application_name')) === '') {
+				$Return['error'] = $this->lang->line('xin_error_application_name_field');
+			} else if ($this->input->post('default_currency_symbol') === '') {
+				$Return['error'] = $this->lang->line('xin_error_default_currency_field');
+			} else if ($this->input->post('show_currency') === '') {
+				$Return['error'] = $this->lang->line('xin_error_default_currency_symbol');
+			} else if ($this->input->post('currency_position') === '') {
+				$Return['error'] = $this->lang->line('xin_error_currency_position');
+			} else if ($this->input->post('date_format') === '') {
+				$Return['error'] = $this->lang->line('xin_error_date_format_field');
+			} else if ($this->input->post('footer_text') === '') {
+				$Return['error'] = $this->lang->line('xin_error_footer_text');
+			} else if ($this->input->post('employee_login_id') === '') {
+				$Return['error'] = $this->lang->line('xin_error_employee_login_id_field');
+			} else if ($this->input->post('system_timezone') === '') {
+				$Return['error'] = $this->lang->line('xin_error_timezone_field');
+			} else if ($this->input->post('system_ip_address') === '') {
+				$Return['error'] = $this->lang->line('xin_error_sys_ip_address_field');
+			} else if ($this->input->post('google_maps_api_key') === '') {
+				$Return['error'] = $this->lang->line('xin_error_gmap_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'application_name' => $this->input->post('application_name'),
+				'd_gst' => $this->input->post('d_gst'),
+				'default_currency_symbol' => $this->input->post('default_currency_symbol'),
+				'default_currency' => $this->input->post('default_currency_symbol'),
+				'show_currency' => $this->input->post('show_currency'),
+				'currency_position' => $this->input->post('currency_position'),
+				'date_format_xi' => $this->input->post('date_format'),
+				'footer_text' => $this->input->post('footer_text'),
+				'enable_page_rendered' => $this->input->post('enable_page_rendered'),
+				'enable_current_year' => $this->input->post('enable_current_year'),
+				'employee_login_id' => $this->input->post('employee_login_id'),
+				'enable_auth_background' => $this->input->post('enable_auth_background'),
+				'system_timezone' => $this->input->post('system_timezone'),
+				'google_maps_api_key' => $this->input->post('google_maps_api_key'),
+				'is_ssl_available' => $this->input->post('is_ssl_available'),
+				'default_language' => $this->input->post('default_language'),
+				'statutory_fixed' => $this->input->post('statutory_fixed'),
+				'invoice_terms_condition' => $this->input->post('invoice_terms_condition'),
+				'estimate_terms_condition' => $this->input->post('estimate_terms_condition'),
+				'staff_dashboard' => $this->input->post('staff_dashboard'),
+				'project_dashboard' => $this->input->post('project_dashboard'),
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_system_configuration_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function sidebar_setting_info() {
-	
-		if($this->input->post('type')=='other_settings') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-			
-		$data = array(
-		'enable_attendance' => $this->input->post('enable_attendance'),
-		'enable_job_application_candidates' => $this->input->post('enable_job'),
-		'enable_profile_background' => $this->input->post('enable_profile_background'),
-		'enable_email_notification' => $this->input->post('role_email_notification'),
-		'notification_close_btn' => $this->input->post('close_btn'),
-		'notification_bar' => $this->input->post('notification_bar'),
-		'enable_policy_link' => $this->input->post('role_policy_link'),
-		'enable_layout' => $this->input->post('enable_layout'),
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_setting_config_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function modules_info()
+	{
+
+		if ($this->input->get('type') == 'modules_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			$data = array(
+				'module_recruitment' => $this->input->get('mrecruitment'),
+				'module_travel' => $this->input->get('mtravel'),
+				'module_files' => $this->input->get('mfiles'),
+				'module_language' => $this->input->get('mlanguage'),
+				'module_orgchart' => $this->input->get('morgchart'),
+				'module_events' => $this->input->get('mevents'),
+				'module_chat_box' => $this->input->get('chatbox'),
+				'is_active_sub_departments' => $this->input->get('is_sub_departments'),
+				'module_payroll' => $this->input->get('module_payroll'),
+				'module_performance' => $this->input->get('module_performance'),
+				'module_sales' => $this->input->get('module_sales'),
+				'module_purchase' => $this->input->get('module_purchase'),
+				'module_purchase_requistion' => $this->input->get('module_purchase_requistion'),
+				'module_purchase_order' => $this->input->get('module_purchase_order'),
+				'module_supplier' => $this->input->get('module_supplier'),
+				'module_quotation' => $this->input->get('module_quotation'),
+				'module_invoice' => $this->input->get('module_invoice'),
+				'module_vms' => $this->input->get('module_vms'),
+				'module_overtime_request' => $this->input->get('module_overtime_request')
+
+
+			);
+			//echo "<pre>";print_r($data);exit;
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_system_modules_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function attendance_info() {
-	
-		if($this->input->post('type')=='attendance_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-			
-		$data = array(
-		'enable_attendance' => $this->input->post('enable_attendance'),
-		'enable_clock_in_btn' => $this->input->post('enable_clock_in_btn')
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_attendance_config_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function layout_skin_info()
+	{
+
+		if ($this->input->get('type') == 'hrsale_layout_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = $this->input->get('user_session_id');
+
+			$data = array(
+				'fixed_header' => $this->input->get('fixed_layout_hrsale'),
+				'boxed_wrapper' => $this->input->get('boxed_layout_hrsale'),
+				'compact_sidebar' => $this->input->get('sidebar_layout_hrsale')
+			);
+
+			$result = $this->Employees_model->basic_info($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_system_layout_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function email_info() {
-	
-		if($this->input->post('type')=='email_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-			
-		$data = array(
-		'enable_email_notification' => $this->input->post('enable_email_notification')
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);
-		$cdata = array(
-		'email_type' => $this->input->post('email_type'),
-		'smtp_host' => $this->input->post('smtp_host'),
-		'smtp_username' => $this->input->post('smtp_username'),
-		'smtp_password' => $this->input->post('smtp_password'),
-		'smtp_port' => $this->input->post('smtp_port'),
-		'smtp_secure' => $this->input->post('smtp_secure')
-		);
-		$this->Xin_model->update_email_config_record($cdata,1);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_email_notify_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function role_info()
+	{
+
+		if ($this->input->post('type') == 'role_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			$data = array(
+				'employee_manage_own_contact' => $this->input->post('employee_manage_own_contact'),
+				'employee_manage_own_social' => $this->input->post('employee_manage_own_social'),
+				'employee_manage_own_bank_account' => $this->input->post('employee_manage_own_bank_account'),
+				'employee_manage_own_qualification' => $this->input->post('employee_manage_own_qualification'),
+				'employee_manage_own_work_experience' => $this->input->post('employee_manage_own_work_experience'),
+				'employee_manage_own_document' => $this->input->post('employee_manage_own_document'),
+				'employee_manage_own_picture' => $this->input->post('employee_manage_own_picture'),
+				'employee_manage_own_profile' => $this->input->post('employee_manage_own_profile'),
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_role_config_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function job_info() {
-	
-		if($this->input->post('type')=='job_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		if($this->input->post('job_application_format')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_job_app_format');
-		}
-		
-		if($Return['error']!=''){
-			$hrm_f->output($Return);
-		}
-		$job_format = str_replace(array('php', '', 'js', '','html', ''), '',$this->input->post('job_application_format'));
-		$id = 1;
-			
-		$data = array(
-		'enable_job_application_candidates' => $this->input->post('enable_job'),
-		'job_application_format' => $job_format
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_job_config_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function sidebar_setting_info()
+	{
+
+		if ($this->input->post('type') == 'other_settings') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			$data = array(
+				'enable_attendance' => $this->input->post('enable_attendance'),
+				'enable_job_application_candidates' => $this->input->post('enable_job'),
+				'enable_profile_background' => $this->input->post('enable_profile_background'),
+				'enable_email_notification' => $this->input->post('role_email_notification'),
+				'notification_close_btn' => $this->input->post('close_btn'),
+				'notification_bar' => $this->input->post('notification_bar'),
+				'enable_policy_link' => $this->input->post('role_policy_link'),
+				'enable_layout' => $this->input->post('enable_layout'),
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_setting_config_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function animation_effect_info() {
-	
-		if($this->input->post('type')=='animation_effect_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-			
-		$data = array(
-		'animation_effect' => $this->input->post('animation_effect'),
-		'animation_effect_topmenu' => $this->input->post('animation_effect_topmenu'),
-		'animation_effect_modal' => $this->input->post('animation_effect_modal')
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_animation_config_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function attendance_info()
+	{
+
+		if ($this->input->post('type') == 'attendance_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			$data = array(
+				'enable_attendance' => $this->input->post('enable_attendance'),
+				'enable_clock_in_btn' => $this->input->post('enable_clock_in_btn')
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_attendance_config_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// Validate and update info in database
-	public function notification_position_info() {
-	
-		if($this->input->post('type')=='notification_position_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		if($this->input->post('notification_position')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_notify_position');
-		}
-		
-		if($Return['error']!=''){
-			$hrm_f->output($Return);
-		}
-		$id = 1;
-			
-		$data = array(
-		'notification_position' => $this->input->post('notification_position'),
-		'notification_close_btn' => $this->input->post('notification_close_btn'),
-		'notification_bar' => $this->input->post('notification_bar')
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_notify_position_config_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function email_info()
+	{
+
+		if ($this->input->post('type') == 'email_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			$data = array(
+				'enable_email_notification' => $this->input->post('enable_email_notification')
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+			$cdata = array(
+				'email_type' => $this->input->post('email_type'),
+				'smtp_host' => $this->input->post('smtp_host'),
+				'smtp_username' => $this->input->post('smtp_username'),
+				'smtp_password' => $this->input->post('smtp_password'),
+				'smtp_port' => $this->input->post('smtp_port'),
+				'smtp_secure' => $this->input->post('smtp_secure')
+			);
+			$this->Xin_model->update_email_config_record($cdata, 1);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_email_notify_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
-	public function delete_single_backup() {
+
+	// Validate and update info in database
+	public function job_info()
+	{
+
+		if ($this->input->post('type') == 'job_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			if ($this->input->post('job_application_format') === '') {
+				$Return['error'] = $this->lang->line('xin_error_job_app_format');
+			}
+
+			if ($Return['error'] != '') {
+				$hrm_f->output($Return);
+			}
+			$job_format = str_replace(array('php', '', 'js', '', 'html', ''), '', $this->input->post('job_application_format'));
+			$id = 1;
+
+			$data = array(
+				'enable_job_application_candidates' => $this->input->post('enable_job'),
+				'job_application_format' => $job_format
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_job_config_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function animation_effect_info()
+	{
+
+		if ($this->input->post('type') == 'animation_effect_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			$data = array(
+				'animation_effect' => $this->input->post('animation_effect'),
+				'animation_effect_topmenu' => $this->input->post('animation_effect_topmenu'),
+				'animation_effect_modal' => $this->input->post('animation_effect_modal')
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_animation_config_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function notification_position_info()
+	{
+
+		if ($this->input->post('type') == 'notification_position_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			if ($this->input->post('notification_position') === '') {
+				$Return['error'] = $this->lang->line('xin_error_notify_position');
+			}
+
+			if ($Return['error'] != '') {
+				$hrm_f->output($Return);
+			}
+			$id = 1;
+
+			$data = array(
+				'notification_position' => $this->input->post('notification_position'),
+				'notification_close_btn' => $this->input->post('notification_close_btn'),
+				'notification_bar' => $this->input->post('notification_bar')
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_notify_position_config_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function delete_single_backup()
+	{
 		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 		$id = $this->uri->segment(4);
 		$Return['csrf_hash'] = $this->security->get_csrf_hash();
 		$result = $this->Xin_model->delete_single_backup_record($id);
-		if(isset($id)) {
+		if (isset($id)) {
 			$Return['result'] = $this->lang->line('xin_success_database_backup_deleted');
 		} else {
 			$Return['error'] = $this->lang->line('xin_error_msg');
 		}
 		$this->output($Return);
 	}
-	
+
 	/*  ALL CONSTANTS */
-	
+
 	// Contract Type > list
-	  public function contract_type_list()
-     {
+	public function contract_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1438,37 +1926,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$contract_type = $this->Xin_model->get_contract_types();
 
 		$data = array();
 
-        foreach($contract_type->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->contract_type_id . '" data-field_type="contract_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->contract_type_id . '" data-token_type="contract_type"><span class="fa fa-trash"></span></button></span>',
-			$r->name,
-		);
-      }
+		foreach ($contract_type->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $contract_type->num_rows(),
-			 "recordsFiltered" => $contract_type->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->contract_type_id . '" data-field_type="contract_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->contract_type_id . '" data-token_type="contract_type"><span class="fa fa-trash"></span></button></span>',
+				$r->name,
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $contract_type->num_rows(),
+			"recordsFiltered" => $contract_type->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     } 
-	 
-	 // Education Level > list
-	  public function education_level_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Education Level > list
+	public function education_level_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1477,37 +1966,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_qualification_education();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->education_level_id . '" data-field_type="education_level"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->education_level_id . '" data-token_type="education_level"><span class="fa fa-trash"></span></button></span>',
-			$r->name,
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->education_level_id . '" data-field_type="education_level"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->education_level_id . '" data-token_type="education_level"><span class="fa fa-trash"></span></button></span>',
+				$r->name,
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Language > list
-	  public function qualification_language_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Language > list
+	public function qualification_language_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1516,37 +2006,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_qualification_language();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->language_id . '" data-field_type="qualification_language"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->language_id . '"  data-token_type="qualification_language"><span class="fa fa-trash"></span></button></span>',
-			$r->name,
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->language_id . '" data-field_type="qualification_language"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->language_id . '"  data-token_type="qualification_language"><span class="fa fa-trash"></span></button></span>',
+				$r->name,
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Skill > list
-	  public function qualification_skill_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Skill > list
+	public function qualification_skill_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1555,37 +2046,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_qualification_skill();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->skill_id . '" data-field_type="qualification_skill"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->skill_id . '" data-token_type="qualification_skill"><span class="fa fa-trash"></span></button></span>',
-			$r->name,
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->skill_id . '" data-field_type="qualification_skill"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->skill_id . '" data-token_type="qualification_skill"><span class="fa fa-trash"></span></button></span>',
+				$r->name,
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Document Type > list
-	  public function document_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Document Type > list
+	public function document_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1594,37 +2086,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_document_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->document_type_id . '" data-field_type="document_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->document_type_id . '" data-token_type="document_type"><span class="fa fa-trash"></span></button></span>',
-			$r->document_type,
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->document_type_id . '" data-field_type="document_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->document_type_id . '" data-token_type="document_type"><span class="fa fa-trash"></span></button></span>',
+				$r->document_type,
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Award Type > list
-	  public function award_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Award Type > list
+	public function award_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1633,37 +2126,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_award_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->award_type_id . '" data-field_type="award_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->award_type_id . '" data-token_type="award_type"><span class="fa fa-trash"></span></button></span>',
-			$r->award_type,
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->award_type_id . '" data-field_type="award_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->award_type_id . '" data-token_type="award_type"><span class="fa fa-trash"></span></button></span>',
+				$r->award_type,
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Leave Type > list
-	  public function leave_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Leave Type > list
+	public function leave_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1672,38 +2166,39 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_leave_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->leave_type_id . '" data-field_type="leave_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->leave_type_id . '" data-token_type="leave_type"><span class="fa fa-trash"></span></button></span>',
-			$r->type_name,
-			$r->days_per_year
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->leave_type_id . '" data-field_type="leave_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->leave_type_id . '" data-token_type="leave_type"><span class="fa fa-trash"></span></button></span>',
+				$r->type_name,
+				($r->is_paid) ? 'Yes' : 'No'
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Warning Type > list
-	  public function warning_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Warning Type > list
+	public function warning_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1712,36 +2207,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_warning_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->warning_type_id . '" data-field_type="warning_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->warning_type_id . '" data-token_type="warning_type"><span class="fa fa-trash"></span></button></span>',
-			$r->type
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->warning_type_id . '" data-field_type="warning_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->warning_type_id . '" data-token_type="warning_type"><span class="fa fa-trash"></span></button></span>',
+				$r->type
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Ethnicity Type > list
-	  public function ethnicity_type_list(){
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Ethnicity Type > list
+	public function ethnicity_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1750,36 +2247,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_ethnicity_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->ethnicity_type_id . '" data-field_type="ethnicity_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->ethnicity_type_id . '" data-token_type="ethnicity_type"><span class="fa fa-trash"></span></button></span>',
-			$r->type
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->ethnicity_type_id . '" data-field_type="ethnicity_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->ethnicity_type_id . '" data-token_type="ethnicity_type"><span class="fa fa-trash"></span></button></span>',
+				$r->type
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Income Type > list
-	  public function income_type_list(){
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Income Type > list
+	public function income_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1788,37 +2287,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_income_categories();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->category_id . '" data-field_type="income_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->category_id . '" data-token_type="income_type"><span class="fa fa-trash"></span></button></span>',
-			$r->name
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->category_id . '" data-field_type="income_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->category_id . '" data-token_type="income_type"><span class="fa fa-trash"></span></button></span>',
+				$r->name
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Termination Type > list
-	  public function termination_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Termination Type > list
+	public function termination_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1827,37 +2327,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_termination_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->termination_type_id . '" data-field_type="termination_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->termination_type_id . '" data-token_type="termination_type"><span class="fa fa-trash"></span></button></span>',
-			$r->type
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->termination_type_id . '" data-field_type="termination_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->termination_type_id . '" data-token_type="termination_type"><span class="fa fa-trash"></span></button></span>',
+				$r->type
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Expense Type > list
-	  public function expense_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Expense Type > list
+	public function expense_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1866,45 +2367,46 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_expense_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
+		foreach ($constant->result() as $r) {
 			// get company
 			$company = $this->Xin_model->read_company_info($r->company_id);
-			if(!is_null($company)){
+			if (!is_null($company)) {
 				$comp_name = $company[0]->name;
 			} else {
-			  $comp_name = '--';	
+				$comp_name = '--';
 			}
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->expense_type_id . '" data-field_type="expense_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->expense_type_id . '" data-token_type="expense_type"><span class="fa fa-trash"></span></button></span>',
-			$comp_name,
-			$r->name
-		);
-      }
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->expense_type_id . '" data-field_type="expense_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->expense_type_id . '" data-token_type="expense_type"><span class="fa fa-trash"></span></button></span>',
+				$comp_name,
+				$r->name
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Job Type > list
-	  public function job_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Job Type > list
+	public function job_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1913,37 +2415,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_job_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->job_type_id . '" data-field_type="job_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->job_type_id . '" data-token_type="job_type"><span class="fa fa-trash"></span></button></span>',
-			$r->type
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->job_type_id . '" data-field_type="job_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->job_type_id . '" data-token_type="job_type"><span class="fa fa-trash"></span></button></span>',
+				$r->type
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Job Categories > list
-	  public function job_category_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Job Categories > list
+	public function job_category_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1952,37 +2455,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_job_categories();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->category_id . '" data-field_type="job_category"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->category_id . '" data-token_type="job_category"><span class="fa fa-trash"></span></button></span>',
-			$r->category_name
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->category_id . '" data-field_type="job_category"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->category_id . '" data-token_type="job_category"><span class="fa fa-trash"></span></button></span>',
+				$r->category_name
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Exit Type > list
-	  public function exit_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Exit Type > list
+	public function exit_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -1991,37 +2495,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_exit_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->exit_type_id . '" data-field_type="exit_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->exit_type_id . '" data-token_type="exit_type"><span class="fa fa-trash"></span></button></span>',
-			$r->type
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->exit_type_id . '" data-field_type="exit_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->exit_type_id . '" data-token_type="exit_type"><span class="fa fa-trash"></span></button></span>',
+				$r->type
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Travel Arrangement Type > list
-	  public function travel_arr_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Travel Arrangement Type > list
+	public function travel_arr_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -2030,37 +2535,38 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_travel_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->arrangement_type_id . '" data-field_type="travel_arr_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->arrangement_type_id . '" data-token_type="travel_arr_type"><span class="fa fa-trash"></span></button></span>',
-			$r->type
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->arrangement_type_id . '" data-field_type="travel_arr_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->arrangement_type_id . '" data-token_type="travel_arr_type"><span class="fa fa-trash"></span></button></span>',
+				$r->type
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Payment Method > list
-	  public function payment_method_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Payment Method > list
+	public function payment_method_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -2069,39 +2575,40 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_payment_method();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-												 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->payment_method_id . '" data-field_type="payment_method"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->payment_method_id . '" data-token_type="payment_method"><span class="fa fa-trash"></span></button></span>',
-			$r->method_name,
-			$r->payment_percentage.'%',
-			$r->account_number
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->payment_method_id . '" data-field_type="payment_method"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->payment_method_id . '" data-token_type="payment_method"><span class="fa fa-trash"></span></button></span>',
+				$r->method_name,
+				$r->payment_percentage . '%',
+				$r->account_number
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Currency type > list
-	  public function currency_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Currency type > list
+	public function currency_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -2110,39 +2617,40 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_currency_types();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->currency_id . '" data-field_type="currency_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->currency_id . '" data-token_type="currency_type"><span class="fa fa-trash"></span></button></span>',
-			$r->name,
-			$r->code,
-			$r->symbol
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->currency_id . '" data-field_type="currency_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->currency_id . '" data-token_type="currency_type"><span class="fa fa-trash"></span></button></span>',
+				$r->name,
+				$r->code,
+				$r->symbol
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 // Company type > list
-	  public function company_type_list()
-     {
+
+		echo json_encode($output);
+		exit();
+	}
+
+	// Company type > list
+	public function company_type_list()
+	{
 
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view("admin/settings/constants", $data);
 		} else {
 			redirect('admin/');
@@ -2151,289 +2659,614 @@ class Settings extends MY_Controller {
 		$draw = intval($this->input->get("draw"));
 		$start = intval($this->input->get("start"));
 		$length = intval($this->input->get("length"));
-		
-		
+
+
 		$constant = $this->Xin_model->get_company_type();
 
 		$data = array();
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->type_id . '" data-field_type="company_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->type_id . '" data-token_type="company_type"><span class="fa fa-trash"></span></button></span>',
-			$r->name
-		);
-      }
+		foreach ($constant->result() as $r) {
 
-	  $output = array(
-		   "draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->type_id . '" data-field_type="company_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->type_id . '" data-token_type="company_type"><span class="fa fa-trash"></span></button></span>',
+				$r->name
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-	  echo json_encode($output);
-	  exit();
-     }
-	 
-	 /*  Add constant data */
-	 
-	// Validate and add info in database
-	public function contract_type_info() {
-	
-		if($this->input->post('type')=='contract_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('contract_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_employee_error_contract_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('contract_type'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		$result = $this->Xin_model->add_contract_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_contract_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
+
+		echo json_encode($output);
+		exit();
 	}
-	
-	// Validate and add info in database
-	public function document_type_info() {
-	
-		if($this->input->post('type')=='document_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('document_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_employee_error_d_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'document_type' => $this->input->post('document_type'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		$result = $this->Xin_model->add_document_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_document_type_added');
+
+	/*  Add constant data */
+
+	/* Packing Type List */
+
+	public function packing_type_list()
+	{
+
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
 		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
+			redirect('admin/');
 		}
-		$this->output($Return);
-		exit;
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->Xin_model->get_packing_type();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->type_id . '" data-field_type="packing_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->type_id . '" data-token_type="packing_type"><span class="fa fa-trash"></span></button></span>',
+				$r->name
+			);
 		}
-	}
-	
-	// Validate and add info in database
-	public function edu_level_info() {
-	
-		if($this->input->post('type')=='edu_level_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_education_level');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('name'),
-		'created_at' => date('d-m-Y h:i:s')
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-		$result = $this->Xin_model->add_edu_level($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_education_level_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
+
+		echo json_encode($output);
+		exit();
 	}
-	
-	// Validate and add info in database
-	public function edu_language_info() {
-	
-		if($this->input->post('type')=='edu_language_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_education_language');
+
+	/* GST List
+	 	 /* Packing Type List */
+
+	public function gst_list()
+	{
+
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
 		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('name'),
-		'created_at' => date('d-m-Y h:i:s')
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->Xin_model->get_gst();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->gst_id . '" data-field_type="gst"><span class="fa fa-pencil"></span></button></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->gst_id . '" data-token_type="gst"><span class="fa fa-trash"></span></button></span>',
+				$r->gst
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-		$result = $this->Xin_model->add_edu_language($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_education_language_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
+
+		echo json_encode($output);
+		exit();
 	}
-	
-	// Validate and add info in database
-	public function edu_skill_info() {
-	
-		if($this->input->post('type')=='edu_skill_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_education_skill');
+
+	public function modeoftransport_list()
+	{
+
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
 		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('name'),
-		'created_at' => date('d-m-Y h:i:s')
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->db->get('mode_of_transport');
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->mst_id . '" data-field_type="mode_of_transport"><span class="fa fa-pencil"></span></button></span></button></span>
+				 <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->mst_id . '" data-token_type="mode_of_transport"><span class="fa fa-trash"></span></button></span>',
+				$r->mst_title
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-		$result = $this->Xin_model->add_edu_skill($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_education_skill_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
+
+		echo json_encode($output);
+		exit();
 	}
-	
-	// Validate and add info in database
-	public function payment_method_info() {
-	
-		if($this->input->post('type')=='payment_method_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('payment_method')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_payment_method');
+
+	public function loantype_list()
+	{
+
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
 		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'method_name' => $this->input->post('payment_method'),
-		'payment_percentage' => $this->input->post('payment_percentage'),
-		'account_number' => $this->input->post('account_number'),
-		'created_at' => date('d-m-Y h:i:s')
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->db->get('loan_type');
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->loan_id . '" data-field_type="loan_type"><span class="fa fa-pencil"></span></button></span></button></span>
+				 <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->loan_id . '" data-token_type="loan_type"><span class="fa fa-trash"></span></button></span>',
+				$r->loan_title
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-		$result = $this->Xin_model->add_payment_method($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_payment_method_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
+
+		echo json_encode($output);
+		exit();
 	}
-	
-	// Validate and add info in database
-	public function award_type_info() {
-	
-		if($this->input->post('type')=='award_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('award_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_award_error_award_type');
+
+	public function payment_term_list()
+	{
+
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
 		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'award_type' => $this->input->post('award_type'),
-		'created_at' => date('d-m-Y h:i:s')
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->Xin_model->get_payment_term();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->payment_term_id  . '" data-field_type="payment_term"><span class="fa fa-pencil"></span></button></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->payment_term_id . '" data-token_type="payment_term"><span class="fa fa-trash"></span></button></span>',
+				$r->payment_term
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
 		);
-		
-		$result = $this->Xin_model->add_award_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_award_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
+
+		echo json_encode($output);
+		exit();
 	}
-	
+
+	public function shipping_term_list()
+	{
+
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
+		}
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->db->get('xin_shipping_term');
+		//  $this->Xin_model->get_payment_term();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->shipping_term_id  . '" data-field_type="shipping_term"><span class="fa fa-pencil"></span></button></span></button></span>
+			 				  <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->shipping_term_id . '" data-token_type="shipping_term"><span class="fa fa-trash"></span></button></span>',
+				$r->shipping_term
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
+		);
+
+		echo json_encode($output);
+		exit();
+	}
+
+
+
+	public function unit_list()
+	{
+
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/settings/constants", $data);
+		} else {
+			redirect('admin/');
+		}
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+
+		$constant = $this->Xin_model->get_unit();
+
+		$data = array();
+
+		foreach ($constant->result() as $r) {
+
+			$data[] = array(
+				'<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_edit') . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="' . $r->unit_id  . '" data-field_type="unit"><span class="fa fa-pencil"></span></button></span></button></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_delete') . '"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="' . $r->unit_id . '" data-token_type="unit"><span class="fa fa-trash"></span></button></span>',
+				$r->unit
+			);
+		}
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $constant->num_rows(),
+			"recordsFiltered" => $constant->num_rows(),
+			"data" => $data
+		);
+
+		echo json_encode($output);
+		exit();
+	}
 	// Validate and add info in database
-	public function leave_type_info() {
-	
-		if($this->input->post('type')=='leave_type_info') {		
+	public function project_type_info()
+	{
+
+		if ($this->input->post('type') == 'project_type_info') {
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-				
-			/* Server side PHP input validation */		
-			if($this->input->post('leave_type')==='') {
+
+			/* Server side PHP input validation */
+			if ($this->input->post('project_type') === '') {
+				$Return['error'] = "Project Type Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'project_type' => $this->input->post('project_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+			// print_r($data);exit;
+			$result = $this->Xin_model->add_project_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = "Project Type added Successfull";
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function contract_type_info()
+	{
+
+		if ($this->input->post('type') == 'contract_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('contract_type') === '') {
+				$Return['error'] = $this->lang->line('xin_employee_error_contract_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('contract_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+			$result = $this->Xin_model->add_contract_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_contract_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function document_type_info()
+	{
+
+		if ($this->input->post('type') == 'document_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('document_type') === '') {
+				$Return['error'] = $this->lang->line('xin_employee_error_d_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'document_type' => $this->input->post('document_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+			$result = $this->Xin_model->add_document_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_document_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function edu_level_info()
+	{
+
+		if ($this->input->post('type') == 'edu_level_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_education_level');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('name'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_edu_level($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_education_level_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function edu_language_info()
+	{
+
+		if ($this->input->post('type') == 'edu_language_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_education_language');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('name'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_edu_language($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_education_language_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function edu_skill_info()
+	{
+
+		if ($this->input->post('type') == 'edu_skill_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_education_skill');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('name'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_edu_skill($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_education_skill_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function payment_method_info()
+	{
+
+		if ($this->input->post('type') == 'payment_method_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('payment_method') === '') {
+				$Return['error'] = $this->lang->line('xin_error_payment_method');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'method_name' => $this->input->post('payment_method'),
+				'payment_percentage' => $this->input->post('payment_percentage'),
+				'account_number' => $this->input->post('account_number'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_payment_method($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_payment_method_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function award_type_info()
+	{
+
+		if ($this->input->post('type') == 'award_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('award_type') === '') {
+				$Return['error'] = $this->lang->line('xin_award_error_award_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'award_type' => $this->input->post('award_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_award_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_award_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function leave_type_info()
+	{
+
+		if ($this->input->post('type') == 'leave_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('leave_type') === '') {
 				$Return['error'] = $this->lang->line('xin_error_leave_type_field');
 			} /*else if($this->input->post('days_per_year')==='') {
-				$Return['error'] = $this->lang->line('xin_error_days_per_year');
-			}*/
-					
-			if($Return['error']!=''){
-				   $this->output($Return);
+        	$Return['error'] = $this->lang->line('xin_error_days_per_year');
+		}*/
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
 			}
-		
+
 			$data = array(
 				'type_name' => $this->input->post('leave_type')
 			);
-			if($this->input->post('leave_is_paid')) {
+			if ($this->input->post('leave_is_paid')) {
 				$data['is_paid'] = $this->input->post('leave_is_paid');
 			}
-			
+
 			$result = $this->Xin_model->add_leave_type($data);
 			if ($result == TRUE) {
 				$Return['result'] = $this->lang->line('xin_success_leave_type_added');
@@ -2444,456 +3277,705 @@ class Settings extends MY_Controller {
 			exit;
 		}
 	}
-	
-	// Validate and add info in database
-	public function warning_type_info() {
-	
-		if($this->input->post('type')=='warning_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('warning_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_employee_error_warning_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'type' => $this->input->post('warning_type'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_warning_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_warning_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and add info in database
-	public function termination_type_info() {
-	
-		if($this->input->post('type')=='termination_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('termination_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_termination_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'type' => $this->input->post('termination_type'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_termination_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_termination_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and add info in database
-	public function expense_type_info() {
-	
-		if($this->input->post('type')=='expense_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('company')==='') {
-        	$Return['error'] = $this->lang->line('error_company_field');
-		} else if($this->input->post('expense_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_expense_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('expense_type'),
-		'company_id' => $this->input->post('company'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_expense_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_expense_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and add info in database
-	public function job_type_info() {
-	
-		if($this->input->post('type')=='job_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('job_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_jobpost_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-		$jurl = random_string('alnum', 40);
-		$data = array(
-		'type' => $this->input->post('job_type'),
-		'type_url' => $jurl,
-		'company_id' => 1,
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_job_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_job_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	// Validate and add info in database
-	public function job_category_info() {
-	
-		if($this->input->post('type')=='job_category_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('job_category')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_job_category');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-		$jurl = random_string('alnum', 40);
-		$data = array(
-		'category_name' => $this->input->post('job_category'),
-		'category_url' => $jurl,
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_job_category($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_job_category_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and add info in database
-	public function exit_type_info() {
-	
-		if($this->input->post('type')=='exit_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('exit_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_exit_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'type' => $this->input->post('exit_type'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_exit_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_error_education_level');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and add info in database
-	public function travel_arr_type_info() {
-	
-		if($this->input->post('type')=='travel_arr_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('travel_arr_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_travel_arrangment_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'type' => $this->input->post('travel_arr_type'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_travel_arr_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_travel_arrangment_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and add info in database
-	public function company_type_info() {
-	
-		if($this->input->post('type')=='company_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('company_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_ctype_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('company_type'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_company_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_company_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and add info in database
-	public function ethnicity_type_info() {
-	
-		if($this->input->post('type')=='ethnicity_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('ethnicity_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_ethnicity_type_error_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'type' => $this->input->post('ethnicity_type'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_ethnicity_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_ethnicity_type_success_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	// Validate and add info in database
-	public function security_level_info() {
-	
-		if($this->input->post('type')=='security_level_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('security_level')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_security_level_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('security_level'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_security_level($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_security_level_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
 
 	// Validate and add info in database
-	public function claim_type_info() {
-	
-		if($this->input->post('type')=='claim_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('claim_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_claim_type_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
+	public function warning_type_info()
+	{
+
+		if ($this->input->post('type') == 'warning_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('warning_type') === '') {
+				$Return['error'] = $this->lang->line('xin_employee_error_warning_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'type' => $this->input->post('warning_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_warning_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_warning_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
 			exit;
-    	}
-	
-		$data = array(
-			'name' => $this->input->post('claim_type'),
-		);
-		
-		$result = $this->Xin_model->add_claim_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_claim_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
 		}
 	}
 
 	// Validate and add info in database
-	public function income_type_info() {
-	
-		if($this->input->post('type')=='income_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('income_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_income_type_error_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('income_type'),
-		'created_at' => date('d-m-Y h:i:s')
-		);
-		
-		$result = $this->Xin_model->add_income_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_income_type_success_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function termination_type_info()
+	{
+
+		if ($this->input->post('type') == 'termination_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('termination_type') === '') {
+				$Return['error'] = $this->lang->line('xin_error_termination_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'type' => $this->input->post('termination_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_termination_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_termination_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
 	// Validate and add info in database
-	public function currency_type_info() {
-	
-		if($this->input->post('type')=='currency_type_info') {		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_currency_name_field');
-		} else if($this->input->post('code')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_currency_code_field');
-		} else if($this->input->post('symbol')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_currency_symbol_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('name'),
-		'code' => $this->input->post('code'),
-		'symbol' => $this->input->post('symbol')
-		);
-		
-		$result = $this->Xin_model->add_currency_type($data);
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_currency_type_added');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
+	public function expense_type_info()
+	{
+
+		if ($this->input->post('type') == 'expense_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('company') === '') {
+				$Return['error'] = $this->lang->line('error_company_field');
+			} else if ($this->input->post('expense_type') === '') {
+				$Return['error'] = $this->lang->line('xin_error_expense_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('expense_type'),
+				'company_id' => $this->input->post('company'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_expense_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_expense_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
 		}
 	}
-	
+
+	// Validate and add info in database
+	public function job_type_info()
+	{
+
+		if ($this->input->post('type') == 'job_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('job_type') === '') {
+				$Return['error'] = $this->lang->line('xin_error_jobpost_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+			$jurl = random_string('alnum', 40);
+			$data = array(
+				'type' => $this->input->post('job_type'),
+				'type_url' => $jurl,
+				'company_id' => 1,
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_job_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_job_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	// Validate and add info in database
+	public function job_category_info()
+	{
+
+		if ($this->input->post('type') == 'job_category_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('job_category') === '') {
+				$Return['error'] = $this->lang->line('xin_error_job_category');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+			$jurl = random_string('alnum', 40);
+			$data = array(
+				'category_name' => $this->input->post('job_category'),
+				'category_url' => $jurl,
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_job_category($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_job_category_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function exit_type_info()
+	{
+
+		if ($this->input->post('type') == 'exit_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('exit_type') === '') {
+				$Return['error'] = $this->lang->line('xin_error_exit_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'type' => $this->input->post('exit_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_exit_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_error_education_level');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function travel_arr_type_info()
+	{
+
+		if ($this->input->post('type') == 'travel_arr_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('travel_arr_type') === '') {
+				$Return['error'] = $this->lang->line('xin_error_travel_arrangment_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'type' => $this->input->post('travel_arr_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_travel_arr_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_travel_arrangment_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function company_type_info()
+	{
+
+		if ($this->input->post('type') == 'company_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('company_type') === '') {
+				$Return['error'] = $this->lang->line('xin_error_ctype_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('company_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_company_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_company_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function packing_type_info()
+	{
+
+		if ($this->input->post('type') == 'packing_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('packing_type') === '') {
+				$Return['error'] = $this->lang->line('xin_error_packing_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('packing_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_packing_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_packing_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function gst_info()
+	{
+
+		if ($this->input->post('type') == 'gst_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('gst') === '') {
+				$Return['error'] = $this->lang->line('xin_error_gst');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'gst' => $this->input->post('gst'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_gst($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_gst_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function mode_of_transport_info()
+	{
+
+		if ($this->input->post('type') == 'mode_of_transport_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('transport_mode') === '') {
+				$Return['error'] = "Mode of Transport Field Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'mst_title' => $this->input->post('transport_mode'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->db->insert('mode_of_transport', $data);
+			if ($result == TRUE) {
+				$Return['result'] = "Mode of Transport Add Successfull";
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function loan_type_info()
+	{
+
+		if ($this->input->post('type') == 'loan_type_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('loan_type') === '') {
+				$Return['error'] = "Loan Type Field Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'loan_title' => $this->input->post('loan_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->db->insert('loan_type', $data);
+			if ($result == TRUE) {
+				$Return['result'] = "Loan Type Add Successfull";
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function payment_term_info()
+	{
+
+		if ($this->input->post('type') == 'payment_term_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('payment_term') === '') {
+				$Return['error'] = $this->lang->line('xin_error_payment_term');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'payment_term' => $this->input->post('payment_term'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_payment_term($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_payment_term_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function shipping_term_info()
+	{
+
+		if ($this->input->post('type') == 'shipping_term_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('shipping_term') === '') {
+				$Return['error'] = "Shipping Term Field Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'shipping_term' => $this->input->post('shipping_term'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->db->insert('xin_shipping_term', $data);
+			// $this->Xin_model->add_shipping_term($data);
+			if ($result == TRUE) {
+				$Return['result'] = "Shipping Term Added Successfull";
+			} else {
+				$Return['error'] = "Something Went Wrong";
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+
+	public function unit_info()
+	{
+
+		if ($this->input->post('type') == 'unit_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('unit') === '') {
+				$Return['error'] = $this->lang->line('xin_error_unit');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'unit' => $this->input->post('unit'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_unit($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_unit_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	// Validate and add info in database
+	public function ethnicity_type_info()
+	{
+
+		if ($this->input->post('type') == 'ethnicity_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('ethnicity_type') === '') {
+				$Return['error'] = $this->lang->line('xin_ethnicity_type_error_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'type' => $this->input->post('ethnicity_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_ethnicity_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_ethnicity_type_success_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	// Validate and add info in database
+	public function security_level_info()
+	{
+
+		if ($this->input->post('type') == 'security_level_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('security_level') === '') {
+				$Return['error'] = $this->lang->line('xin_error_security_level_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('security_level'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_security_level($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_security_level_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function term_level_info()
+	{
+
+		if ($this->input->post('type') == 'term_condition_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('term_condition_title') === '') {
+				$Return['error'] = $this->lang->line('xin_error_term');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'term_title' => $this->input->post('term_condition_title'),
+				'term_description' => $this->input->post('term_condition_description'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_term_condition($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_term_condition_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	// Validate and add info in database
+	public function income_type_info()
+	{
+
+		if ($this->input->post('type') == 'income_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('income_type') === '') {
+				$Return['error'] = $this->lang->line('xin_income_type_error_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('income_type'),
+				'created_at' => date('d-m-Y h:i:s')
+			);
+
+			$result = $this->Xin_model->add_income_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_income_type_success_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and add info in database
+	public function currency_type_info()
+	{
+
+		if ($this->input->post('type') == 'currency_type_info') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_currency_name_field');
+			} else if ($this->input->post('code') === '') {
+				$Return['error'] = $this->lang->line('xin_error_currency_code_field');
+			} else if ($this->input->post('symbol') === '') {
+				$Return['error'] = $this->lang->line('xin_error_currency_symbol_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('name'),
+				'code' => $this->input->post('code'),
+				'symbol' => $this->input->post('symbol')
+			);
+
+			$result = $this->Xin_model->add_currency_type($data);
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_currency_type_added');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
 	/*  DELETE CONSTANTS */
 	// delete constant record > table
-	public function delete_contract_type() {
-		
-		if($this->input->post('type')=='delete_record') {
+	public function delete_contract_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$id = $this->uri->segment(4);
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
 			$result = $this->Xin_model->delete_contract_type_record($id);
-			if(isset($id)) {
+			if (isset($id)) {
 				$Return['result'] = $this->lang->line('xin_success_contract_type_deleted');
 			} else {
 				$Return['error'] = $this->lang->line('xin_error_msg');
@@ -2901,341 +3983,35 @@ class Settings extends MY_Controller {
 			$this->output($Return);
 		}
 	}
-	
-	// delete constant record > table
-	public function delete_document_type() {
-		
-		if($this->input->post('type')=='delete_record') {
+
+	public function delete_mode_of_transport()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$id = $this->uri->segment(4);
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_document_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_document_type_deleted');
+			$result = $this->db->delete('mode_of_transport', ['mst_id' => $id]);
+			if (isset($id)) {
+				$Return['result'] = "Delete Transport Type";
 			} else {
 				$Return['error'] = $this->lang->line('xin_error_msg');
 			}
 			$this->output($Return);
 		}
 	}
-	
-	// delete constant record > table
-	public function delete_payment_method() {
-		
-		if($this->input->post('type')=='delete_record') {
+	public function delete_loan_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$id = $this->uri->segment(4);
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_payment_method_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_payment_method_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_education_level() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_education_level_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_education_level_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_qualification_language() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_qualification_language_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_qualification_lang_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_qualification_skill() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_qualification_skill_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_qualification_skill_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_award_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_award_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_award_type_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_leave_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_leave_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_leave_type_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_warning_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_warning_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_warning_type_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_termination_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_termination_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_termination_type_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_expense_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_expense_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_expense_type_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_job_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_job_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_job_type_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_job_category() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_job_category_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_job_category_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_exit_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_exit_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_exit_type_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_travel_arr_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_travel_arr_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_travel_arrtype_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_ethnicity_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_ethnicity_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_ethnicity_type_success_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_income_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_income_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_income_type_success_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_currency_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_currency_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_success_currency_type_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	
-	// delete constant record > table
-	public function delete_company_type() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_company_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_company_type_deleted');
-			} else {
-				$Return['error'] = $this->lang->line('xin_error_msg');
-			}
-			$this->output($Return);
-		}
-	}
-	// delete constant record > table
-	public function delete_security_level() {
-		
-		if($this->input->post('type')=='delete_record') {
-			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-			$id = $this->uri->segment(4);
-			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_security_level_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_security_level_deleted');
+			$result = $this->db->delete('loan_type', ['loan_id' => $id]);
+			if (isset($id)) {
+				$Return['result'] = "Delete Loan Type";
 			} else {
 				$Return['error'] = $this->lang->line('xin_error_msg');
 			}
@@ -3244,32 +4020,487 @@ class Settings extends MY_Controller {
 	}
 
 	// delete constant record > table
-	public function delete_claim_type() {
-		
-		if($this->input->post('type')=='delete_record') {
+	public function delete_document_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$id = $this->uri->segment(4);
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_claim_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_claim_type_deleted');
+			$result = $this->Xin_model->delete_document_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_document_type_deleted');
 			} else {
 				$Return['error'] = $this->lang->line('xin_error_msg');
 			}
 			$this->output($Return);
 		}
 	}
-	public function delete_deduction_type() {
-		
-		if($this->input->post('type')=='delete_record') {
+
+	// delete constant record > table
+	public function delete_payment_method()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$id = $this->uri->segment(4);
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			$result = $this->Xin_model->delete_deduction_type_record($id);
-			if(isset($id)) {
-				$Return['result'] = $this->lang->line('xin_deduction_type_deleted');
+			$result = $this->Xin_model->delete_payment_method_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_payment_method_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_education_level()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_education_level_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_education_level_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_qualification_language()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_qualification_language_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_qualification_lang_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_qualification_skill()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_qualification_skill_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_qualification_skill_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_award_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_award_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_award_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_leave_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_leave_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_leave_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_warning_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_warning_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_warning_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_termination_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_termination_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_termination_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_expense_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_expense_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_expense_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_job_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_job_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_job_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_job_category()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_job_category_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_job_category_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_exit_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_exit_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_exit_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_travel_arr_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_travel_arr_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_travel_arrtype_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_ethnicity_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_ethnicity_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_ethnicity_type_success_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_income_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_income_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_income_type_success_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_currency_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_currency_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_success_currency_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	// delete constant record > table
+	public function delete_company_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_company_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_company_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	public function delete_packing_type()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_packing_type_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_packing_type_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	public function delete_gst()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_gst_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_gst_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+	public function delete_payment_term()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_payment_term_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_payment_term_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	public function delete_unit()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_unit_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_unit_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+	public function delete_term_condition_level()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_term_condition($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_term_condition_deleted');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+		}
+	}
+
+	public function delete_project_type_level()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->db->delete('xin_project_type', ['project_type_id' => $id]);
+
+			if (isset($id)) {
+				$Return['result'] = "Project Type Deleted Successfull";
+			} else {
+				$Return['error'] = "Something Went Wrong";
+			}
+			$this->output($Return);
+		}
+	}
+
+
+	public function delete_delivery_time()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->db->delete('delivery_weeks', ['id' => $id]);
+
+			if (isset($id)) {
+				$Return['result'] = "Delivery Week Deleted Successfull";
+			} else {
+				$Return['error'] = "Something Went Wrong";
+			}
+			$this->output($Return);
+		}
+	}
+
+
+	// delete constant record > table
+	public function delete_security_level()
+	{
+
+		if ($this->input->post('type') == 'delete_record') {
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$id = $this->uri->segment(4);
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$result = $this->Xin_model->delete_security_level_record($id);
+			if (isset($id)) {
+				$Return['result'] = $this->lang->line('xin_security_level_deleted');
 			} else {
 				$Return['error'] = $this->lang->line('xin_error_msg');
 			}
@@ -3281,379 +4512,389 @@ class Settings extends MY_Controller {
 	{
 		$data['title'] = $this->Xin_model->site_title();
 		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
+		if (!empty($session)) {
 			$this->load->view('admin/settings/dialog_constants', $data);
 		} else {
 			redirect('admin/');
 		}
 	}
-	
+
 	/*  UPDATE RECORD > CONSTANTS*/
-	
+
 	// Validate and update info in database
-	public function update_document_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_employee_error_d_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'document_type' => $this->input->post('name'),
-		'company_id' => $this->input->post('company')
-		);
-		
-		$result = $this->Xin_model->update_document_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_document_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_ethnicity_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('ethnicity_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_ethnicity_type_error_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'type' => $this->input->post('ethnicity_type'),
-		);
-		
-		$result = $this->Xin_model->update_ethnicity_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_ethnicity_type_success_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_income_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('income_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_income_type_error_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('income_type'),
-		);
-		
-		$result = $this->Xin_model->update_income_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_income_type_success_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_contract_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] =$this->lang->line('xin_employee_error_contract_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'name' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_contract_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_contract_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_payment_method() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_payment_method');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'method_name' => $this->input->post('name'),
-		'payment_percentage' => $this->input->post('payment_percentage'),
-		'account_number' => $this->input->post('account_number')
-		);
-		
-		$result = $this->Xin_model->update_payment_method_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_payment_method_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_education_level() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_education_level');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'name' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_education_level_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_education_level_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_qualification_language() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_education_language');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'name' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_qualification_language_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_error_education_level');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_qualification_skill() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_education_skill');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'name' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_qualification_skill_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_qualification_skill_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_award_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_award_error_award_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'award_type' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_award_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_award_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_leave_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
+	public function update_document_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
 			$id = $this->uri->segment(4);
-			
+
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-			/* Server side PHP input validation */		
-			if($this->input->post('name')==='') {
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_employee_error_d_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'document_type' => $this->input->post('name'),
+				'company_id' => $this->input->post('company')
+			);
+
+			$result = $this->Xin_model->update_document_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_document_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_ethnicity_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('ethnicity_type') === '') {
+				$Return['error'] = $this->lang->line('xin_ethnicity_type_error_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'type' => $this->input->post('ethnicity_type'),
+			);
+
+			$result = $this->Xin_model->update_ethnicity_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_ethnicity_type_success_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_income_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('income_type') === '') {
+				$Return['error'] = $this->lang->line('xin_income_type_error_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('income_type'),
+			);
+
+			$result = $this->Xin_model->update_income_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_income_type_success_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_contract_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_employee_error_contract_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'name' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_contract_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_contract_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_payment_method()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_payment_method');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'method_name' => $this->input->post('name'),
+				'payment_percentage' => $this->input->post('payment_percentage'),
+				'account_number' => $this->input->post('account_number')
+			);
+
+			$result = $this->Xin_model->update_payment_method_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_payment_method_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_education_level()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_education_level');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'name' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_education_level_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_education_level_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_qualification_language()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_education_language');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'name' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_qualification_language_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_error_education_level');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_qualification_skill()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_education_skill');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'name' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_qualification_skill_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_qualification_skill_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_award_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_award_error_award_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'award_type' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_award_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_award_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_leave_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
 				$Return['error'] = $this->lang->line('xin_error_leave_type_field');
 			}
-					
-			if($Return['error']!=''){
-				   $this->output($Return);
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
 			}
-		
+
 			$data = array(
-			'type_name' => $this->input->post('name')
+				'type_name' => $this->input->post('name')
 			);
-			if($this->input->post('leave_is_paid')) {
+			if ($this->input->post('leave_is_paid')) {
 				$data['is_paid'] = 1;
-			}else {
+			} else {
 				$data['is_paid'] = 0;
 			}
-			
-			$result = $this->Xin_model->update_leave_type_record($data,$id);		
-			
+
+			$result = $this->Xin_model->update_leave_type_record($data, $id);
+
 			if ($result == TRUE) {
 				$Return['result'] = $this->lang->line('xin_success_leave_type_updated');
 			} else {
@@ -3663,610 +4904,1182 @@ class Settings extends MY_Controller {
 			exit;
 		}
 	}
-	
-	// Validate and update info in database
-	public function update_warning_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_employee_error_warning_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'type' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_warning_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_warning_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_termination_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_termination_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'type' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_termination_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_termination_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_expense_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('company')==='') {
-        	$Return['error'] = $this->lang->line('error_company_field');
-		} else if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_expense_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'company_id' => $this->input->post('company'),
-		'name' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_expense_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_expense_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_job_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_jobpost_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'type' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_job_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_job_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_job_category() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('job_category')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_job_category');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'category_name' => $this->input->post('job_category')
-		);
-		
-		$result = $this->Xin_model->update_job_category_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_job_category_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_exit_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_exit_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'type' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_exit_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_exit_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_travel_arr_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_travel_arrangment_type');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'type' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_travel_arr_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_travel_arrtype_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_company_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_ctype_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('name')
-		);
-		
-		$result = $this->Xin_model->update_company_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_company_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	
-	// Validate and update info in database
-	public function update_currency_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('name')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_currency_name_field');
-		} else if($this->input->post('code')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_currency_code_field');
-		} else if($this->input->post('symbol')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_currency_symbol_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		
-		'name' => $this->input->post('name'),
-		'code' => $this->input->post('code'),
-		'symbol' => $this->input->post('symbol')
-		);
-		
-		$result = $this->Xin_model->update_currency_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_currency_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	// Validate and update info in database
-	public function update_payment_gateway() {
-	
-		if($this->input->post('type')=='payment_gateway') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		$id = 1;
-	
-		$data = array(
-		'paypal_email' => $this->input->post('paypal_email'),
-		'paypal_sandbox' => $this->input->post('paypal_sandbox'),
-		'paypal_active' => $this->input->post('paypal_active'),
-		'stripe_secret_key' => $this->input->post('stripe_secret_key'),
-		'stripe_publishable_key' => $this->input->post('stripe_publishable_key'),
-		'stripe_active' => $this->input->post('stripe_active'),
-		'online_payment_account' => $this->input->post('bank_cash_id'),
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_acc_payment_gateway_info_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}	
-	// Validate and update info in database
-	public function update_security_level() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('security_level')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_security_level_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-		'name' => $this->input->post('security_level')
-		);
-		
-		$result = $this->Xin_model->update_security_level_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_security_level_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
 
 	// Validate and update info in database
-	public function update_claim_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('claim_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_claim_type_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-			'name' => $this->input->post('claim_type')
-		);
-		
-		$result = $this->Xin_model->update_claim_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_claim_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	public function update_deduction_type() {
-	
-		if($this->input->post('type')=='edit_record') {
-			
-		$id = $this->uri->segment(4);
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		/* Server side PHP input validation */		
-		if($this->input->post('deduction_type')==='') {
-        	$Return['error'] = $this->lang->line('xin_error_deduction_type_field');
-		}
-				
-		if($Return['error']!=''){
-       		$this->output($Return);
-    	}
-	
-		$data = array(
-			'deduction_type' => $this->input->post('deduction_type')
-		);
-		
-		$result = $this->Xin_model->update_deduction_type_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_deduction_type_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	// Validate and update info in database
-	public function performance_info() {
-	
-		if($this->input->post('type')=='performance_info') {
-		
-		/* Define return | here result is used to return user data and error for error message */
-		$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
-		$Return['csrf_hash'] = $this->security->get_csrf_hash();
-		
-		if($this->input->post('technical_competencies')==='') {
-        	$Return['error'] = $this->lang->line('xin_performance_technical_error_field');
-		} else if($this->input->post('organizational_competencies')==='') {
-        	$Return['error'] = $this->lang->line('xin_performance_org_error_field');
-		}
-		
-		if($Return['error']!=''){
-			$hrm_f->output($Return);
-		}
-		$technical_competencies = str_replace(array('php', '', 'js', '','html', ''), '',$this->input->post('technical_competencies'));
-		$organizational_competencies = str_replace(array('php', '', 'js', '','html', ''), '',$this->input->post('organizational_competencies'));
-		$id = 1;
-			
-		$data = array(
-		'technical_competencies' => $technical_competencies,
-		'organizational_competencies' => $organizational_competencies
-		);
-		
-		$result = $this->Xin_model->update_setting_info_record($data,$id);		
-		
-		if ($result == TRUE) {
-			$Return['result'] = $this->lang->line('xin_success_performance_config_updated');
-		} else {
-			$Return['error'] = $this->lang->line('xin_error_msg');
-		}
-		$this->output($Return);
-		exit;
-		}
-	}
-	public function enable_leave(){
-		$session = $this->session->userdata('username');
-		if(empty($session)){ 
-			redirect('admin/');
-		}
-		$data['title'] = $this->lang->line('left_settings').' | '.$this->Xin_model->site_title();
-		$setting = $this->Xin_model->read_setting_info(1);
-		$company_info = $this->Xin_model->read_company_setting_info(1);
-		$email_config = $this->Xin_model->read_email_config_info(1);
-		
-		$data['breadcrumbs'] = $this->lang->line('left_settings');
-		$data['path_url'] = 'settings';
-		$role_resources_ids = $this->Xin_model->user_role_resource();
-		if(in_array('60',$role_resources_ids)) {
-			if(!empty($session)){ 
-				$data['subview'] = $this->load->view("admin/settings/enable_leave", $data, TRUE);
-				$this->load->view('admin/layout/pms/layout_pms', $data);; //page load
-			} else {
-				redirect('admin/');
-			}
-		} else {
-			redirect('admin/dashboard');
-		}
-	}
-	public function deduction_type_info(){
-		if($this->input->post('type')=='deduction_type_info') {
-			
-			
-			
+	public function update_warning_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
 			/* Define return | here result is used to return user data and error for error message */
-			$Return = array('result'=>'', 'error'=>'', 'csrf_hash'=>'');
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
 			$Return['csrf_hash'] = $this->security->get_csrf_hash();
-			
-			/* Server side PHP input validation */		
-			if($this->input->post('deduction_type')==='') {
-				$Return['error'] = $this->lang->line('xin_error_deduction_type_field');
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_employee_error_warning_type');
 			}
-					
-			if($Return['error']!=''){
-				   $this->output($Return);
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
 			}
-		
+
 			$data = array(
-				'deduction_type' => $this->input->post('deduction_type')
+
+				'type' => $this->input->post('name')
 			);
-			
-			$result = $this->Xin_model->add_deduction_type($data);		
-			
+
+			$result = $this->Xin_model->update_warning_type_record($data, $id);
+
 			if ($result == TRUE) {
-				$Return['result'] = $this->lang->line('xin_deduction_type_added');
+				$Return['result'] = $this->lang->line('xin_success_warning_type_updated');
 			} else {
 				$Return['error'] = $this->lang->line('xin_error_msg');
 			}
 			$this->output($Return);
 			exit;
-			}
-	}
-	public function deduction_type_list(){
-		$data['title'] = $this->Xin_model->site_title();
-		$session = $this->session->userdata('username');
-		if(!empty($session)){ 
-			$this->load->view("admin/settings/constants", $data);
-		} else {
-			redirect('admin/');
 		}
-		// Datatables Variables
-		$draw = intval($this->input->get("draw"));
-		$start = intval($this->input->get("start"));
-		$length = intval($this->input->get("length"));
-		
-		
-		$constant = $this->Xin_model->get_deduction_type();
+	}
 
-		$data = array();
+	// Validate and update info in database
+	public function update_termination_type()
+	{
 
-        foreach($constant->result() as $r) {
-									 			  				
-		$data[] = array('<span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_edit').'"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light" data-toggle="modal" data-target=".edit_setting_datail" data-field_id="'. $r->deduction_type_id . '" data-field_type="deduction_type"><span class="fa fa-pencil"></span></button></span><span data-toggle="tooltip" data-placement="top" title="'.$this->lang->line('xin_delete').'"><button type="button" class="btn icon-btn btn-xs btn-danger waves-effect waves-light delete" data-toggle="modal" data-target=".delete-modal" data-record-id="'. $r->deduction_type_id . '" data-token_type="deduction_type"><span class="fa fa-trash"></span></button></span>',
-			$r->deduction_type
-		);
-      }
+		if ($this->input->post('type') == 'edit_record') {
 
-	  $output = array(
-		   	"draw" => $draw,
-			 "recordsTotal" => $constant->num_rows(),
-			 "recordsFiltered" => $constant->num_rows(),
-			 "data" => $data
-		);
-		
-	  echo json_encode($output);
-	  exit();
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_termination_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'type' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_termination_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_termination_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_expense_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('company') === '') {
+				$Return['error'] = $this->lang->line('error_company_field');
+			} else if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_expense_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'company_id' => $this->input->post('company'),
+				'name' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_expense_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_expense_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_job_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_jobpost_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'type' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_job_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_job_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_job_category()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('job_category') === '') {
+				$Return['error'] = $this->lang->line('xin_error_job_category');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'category_name' => $this->input->post('job_category')
+			);
+
+			$result = $this->Xin_model->update_job_category_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_job_category_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_exit_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_exit_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'type' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_exit_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_exit_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_travel_arr_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_travel_arrangment_type');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'type' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_travel_arr_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_travel_arrtype_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	// Validate and update info in database
+	public function update_company_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_ctype_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_company_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_company_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function update_packing_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->langline('xin_error_ctyp->e_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('name')
+			);
+
+			$result = $this->Xin_model->update_packing_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_packing_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function update_gst()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('gst') === '') {
+				$Return['error'] = $this->lang->line('xin_error_gst');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'gst' => $this->input->post('gst')
+			);
+
+			$result = $this->Xin_model->update_gst_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_gst_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function update_payment_term()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('gst') === '') {
+				$Return['error'] = $this->lang->line('xin_error_payment_term');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'payment_term' => $this->input->post('payment_term')
+			);
+
+			$result = $this->Xin_model->update_payment_term_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_payment_term_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function update_shipping_term()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('shipping_term') === '') {
+				$Return['error'] = "Shipping Term Field Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'shipping_term' => $this->input->post('shipping_term')
+			);
+
+			$result = $this->db->update('xin_shipping_term', $data, ['shipping_term_id ' => $id]);
+			// $this->Xin_model->update_shipping_term_record($data,$id);		
+
+			if ($result == TRUE) {
+				$Return['result'] = "Shipping Term Updated";
+			} else {
+				$Return['error'] = "Update Failed";
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function update_unit()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('gst') === '') {
+				$Return['error'] = $this->lang->line('xin_error_unit');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'unit' => $this->input->post('unit')
+			);
+
+			$result = $this->Xin_model->update_unit_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_unit_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	// Validate and update info in database
+	public function update_currency_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('name') === '') {
+				$Return['error'] = $this->lang->line('xin_error_currency_name_field');
+			} else if ($this->input->post('code') === '') {
+				$Return['error'] = $this->lang->line('xin_error_currency_code_field');
+			} else if ($this->input->post('symbol') === '') {
+				$Return['error'] = $this->lang->line('xin_error_currency_symbol_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+
+				'name' => $this->input->post('name'),
+				'code' => $this->input->post('code'),
+				'symbol' => $this->input->post('symbol')
+			);
+
+			$result = $this->Xin_model->update_currency_type_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_currency_type_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	// Validate and update info in database
+	public function update_payment_gateway()
+	{
+
+		if ($this->input->post('type') == 'payment_gateway') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+			$id = 1;
+
+			$data = array(
+				'paypal_email' => $this->input->post('paypal_email'),
+				'paypal_sandbox' => $this->input->post('paypal_sandbox'),
+				'paypal_active' => $this->input->post('paypal_active'),
+				'stripe_secret_key' => $this->input->post('stripe_secret_key'),
+				'stripe_publishable_key' => $this->input->post('stripe_publishable_key'),
+				'stripe_active' => $this->input->post('stripe_active'),
+				'online_payment_account' => $this->input->post('bank_cash_id'),
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_acc_payment_gateway_info_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	// Validate and update info in database
+	public function update_security_level()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('security_level') === '') {
+				$Return['error'] = $this->lang->line('xin_error_security_level_field');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'name' => $this->input->post('security_level')
+			);
+
+			$result = $this->Xin_model->update_security_level_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_security_level_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function update_term_condition()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('term_title') === '') {
+				$Return['error'] = $this->lang->line('xin_error_term');
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'term_title' => $this->input->post('term_title'),
+				'term_description' => $this->input->post('term_description'),
+
+			);
+
+			$result = $this->Xin_model->update_term_condition($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_term_condition_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function update_project_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('project_type1') === '') {
+				$Return['error'] = "Project type Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'project_type' => $this->input->post('project_type1'),
+
+			);
+
+			$result = $this->db->update('xin_project_type', $data, ['project_type_id' => $id]);
+
+
+			if ($result == TRUE) {
+				$Return['result'] = "Project type Updated";
+			} else {
+				$Return['error'] = "Project Type Update Failed";
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function update_pay_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('method_name1') === '') {
+				$Return['error'] = "Project type Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'method_name' => $this->input->post('method_name1'),
+
+			);
+
+			$result = $this->db->update('xin_payment_method', $data, ['payment_method_id' => $id]);
+
+
+			if ($result == TRUE) {
+				$Return['result'] = "Payment type Updated";
+			} else {
+				$Return['error'] = "Payment Type Update Failed";
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function update_purchase_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('purpose_title1') === '') {
+				$Return['error'] = "Project type Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'purpose_title' => $this->input->post('purpose_title1'),
+
+			);
+
+			$result = $this->db->update('purchase_purpose', $data, ['id' => $id]);
+
+
+			if ($result == TRUE) {
+				$Return['result'] = "Purchase Purpose Updated";
+			} else {
+				$Return['error'] = "Purchase Purpose Update Failed";
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+	public function update_delivery_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('delivery_time1') === '') {
+				$Return['error'] = "Project type Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'delivery_time' => $this->input->post('delivery_time1'),
+
+			);
+
+			$result = $this->db->update('delivery_weeks', $data, ['id' => $id]);
+
+
+			if ($result == TRUE) {
+				$Return['result'] = "Purchase Purpose Updated";
+			} else {
+				$Return['error'] = "Purchase Purpose Update Failed";
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function update_mode_of_transport_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('transport_mode1') === '') {
+				$Return['error'] = "Transport Mode Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'mst_title' => $this->input->post('transport_mode1'),
+
+			);
+
+			$result = $this->db->update('mode_of_transport', $data, ['mst_id' => $id]);
+
+
+			if ($result == TRUE) {
+				$Return['result'] = "Transport Mode Updated";
+			} else {
+				$Return['error'] = "Transport Mode Update Failed";
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+	public function update_loan_type()
+	{
+
+		if ($this->input->post('type') == 'edit_record') {
+
+			$id = $this->uri->segment(4);
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			/* Server side PHP input validation */
+			if ($this->input->post('loan_type1') === '') {
+				$Return['error'] = "Loan Type Required";
+			}
+
+			if ($Return['error'] != '') {
+				$this->output($Return);
+			}
+
+			$data = array(
+				'loan_title' => $this->input->post('loan_type1'),
+
+			);
+
+			$result = $this->db->update('loan_type', $data, ['loan_id' => $id]);
+
+
+			if ($result == TRUE) {
+				$Return['result'] = "Loan Type Updated";
+			} else {
+				$Return['error'] = "Loan Type Update Failed";
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+
+	// Validate and update info in database
+	public function performance_info()
+	{
+
+		if ($this->input->post('type') == 'performance_info') {
+
+			/* Define return | here result is used to return user data and error for error message */
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			if ($this->input->post('technical_competencies') === '') {
+				$Return['error'] = $this->lang->line('xin_performance_technical_error_field');
+			} else if ($this->input->post('organizational_competencies') === '') {
+				$Return['error'] = $this->lang->line('xin_performance_org_error_field');
+			}
+
+			if ($Return['error'] != '') {
+				$hrm_f->output($Return);
+			}
+			$technical_competencies = str_replace(array('php', '', 'js', '', 'html', ''), '', $this->input->post('technical_competencies'));
+			$organizational_competencies = str_replace(array('php', '', 'js', '', 'html', ''), '', $this->input->post('organizational_competencies'));
+			$id = 1;
+
+			$data = array(
+				'technical_competencies' => $technical_competencies,
+				'organizational_competencies' => $organizational_competencies
+			);
+
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+
+			if ($result == TRUE) {
+				$Return['result'] = $this->lang->line('xin_success_performance_config_updated');
+			} else {
+				$Return['error'] = $this->lang->line('xin_error_msg');
+			}
+			$this->output($Return);
+			exit;
+		}
+	}
+
+
+	public function invoice_template()
+	{
+		if ($this->input->post('type') == 'invoice_template') {
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			if ($this->input->post('gst_reg') === '') {
+				$Return['error'] = "GST REG NO Field Required";
+			} elseif ($this->input->post('reg_no') === '') {
+				$Return['error'] = "Reg NO Field Required";
+			}
+
+			$id = 1;
+			if (is_uploaded_file($_FILES['inv_logo']['tmp_name'])) {
+				$allowed = ['png', 'jpg', 'jpeg', 'gif'];
+				$filename = $_FILES['inv_logo']['name'];
+				$ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+				if (in_array($ext, $allowed)) {
+					$tmp_name = $_FILES["inv_logo"]["tmp_name"];
+					$profile = "uploads/logo/";
+					$newfilename = 'invoice_' . round(microtime(true)) . '.' . $ext;
+					move_uploaded_file($tmp_name, $profile . $newfilename);
+					$fname = $newfilename;
+				} else {
+					$Return['error'] = "Invalid file type for invoice logo.";
+					$this->output($Return);
+					return;
+				}
+			} else {
+				$fname = $this->input->post('invoice_old_logo');
+			}
+
+
+			// if (is_uploaded_file($_FILES['invoice_address_logo']['tmp_name'])) {
+			// 	$allowed = ['png', 'jpg', 'jpeg', 'gif'];
+			// 	$filename = $_FILES['invoice_address_logo']['name']; // FIXED
+			// 	$ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+			// 	if (in_array($ext, $allowed)) {
+			// 		$tmp_name = $_FILES["invoice_address_logo"]["tmp_name"];
+			// 		$profile = "uploads/logo/";
+			// 		$newfilename = 'invoice_' . round(microtime(true)) . '.' . $ext;
+			// 		move_uploaded_file($tmp_name, $profile . $newfilename);
+			// 		$fname2 = $newfilename;
+			// 	} else {
+			// 		$Return['error'] = "Invalid file type for invoice address logo.";
+			// 		$this->output($Return);
+			// 		return;
+			// 	}
+			// } else {
+			// 	$fname2 = $this->input->post('invoice_old_address_logo');
+			// }
+
+
+			$data = array(
+				'invoice_gst_no' => $this->input->post('gst_reg'),
+				'invoice_reg_no' => $this->input->post('reg_no'),
+				'invoice_logo' => $fname,
+				'invoice_address_logo' => $this->input->post('invoice_address_logo'),
+				'invoice_terms_condition' => $this->input->post('invoice_terms_condition'),
+
+			);
+			$result = $this->Xin_model->update_setting_info_record($data, $id);
+			if ($result == TRUE) {
+				// $Return['img'] = $set_img.$fname;
+				$Return['result'] = "Data Updated Successfull";
+			} else {
+				$Return['error'] = "Data Upate Failed";
+			}
+			$this->output($Return);
+			exit;
+
+
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($Return));
+			exit;
+		}
+	}
+
+
+	public function quotation_settings()
+	{
+		if ($this->input->post('type') == 'quote_settings') {
+			$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+			$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+			$id = 1;
+
+			// Function to handle file upload
+			function handleUpload($inputName, $targetDirectory)
+			{
+				if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] == UPLOAD_ERR_NO_FILE) {
+					return ''; // Return empty string if file is not uploaded
+				}
+
+				$allowed = array('png', 'jpg', 'jpeg', 'gif');
+				$filename = $_FILES[$inputName]['name'];
+				$ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+				if (!in_array($ext, $allowed)) {
+					return 'Invalid file format.';
+				}
+
+				$newfilename = 'invoice_' . round(microtime(true)) . '.' . $ext;
+				$targetPath = $targetDirectory . $newfilename;
+
+				if (!move_uploaded_file($_FILES[$inputName]["tmp_name"], $targetPath)) {
+					$error = error_get_last();
+					return 'Error: ' . $error['message'];
+				}
+
+
+				return $newfilename;
+			}
+
+			// Handle uploads for logo1, logo2, logo3, and logo4
+			$fname = handleUpload('logo1', 'uploads/quo/');
+			$fname2 = handleUpload('logo2', 'uploads/quo/');
+			$fname3 = handleUpload('logo3', 'uploads/quo/');
+			$fname4 = handleUpload('logo4', 'uploads/quo/');
+			$fname5 = handleUpload('logo5', 'uploads/quo/');
+			$fname6 = handleUpload('logo6', 'uploads/quo/');
+			$fname7 = handleUpload('logo7', 'uploads/quo/');
+
+			// Get old filenames if images are not uploaded
+			$old_fname1 = $this->input->post('old_logo1');
+			$old_fname2 = $this->input->post('old_logo2');
+			$old_fname3 = $this->input->post('old_logo3');
+			$old_fname4 = $this->input->post('old_logo4');
+			$old_fname5 = $this->input->post('old_logo5');
+			$old_fname6 = $this->input->post('old_logo6');
+			$old_fname7 = $this->input->post('old_logo7');
+
+			// Use old filename if image is not uploaded
+			if (empty($fname)) {
+				$fname = $old_fname1;
+			}
+			if (empty($fname2)) {
+				$fname2 = $old_fname2;
+			}
+			if (empty($fname3)) {
+				$fname3 = $old_fname3;
+			}
+			if (empty($fname4)) {
+				$fname4 = $old_fname4;
+			}
+
+			if (empty($fname5)) {
+				$fname5 = $old_fname5;
+			}
+
+			if (empty($fname6)) {
+				$fname6 = $old_fname6;
+			}
+
+			if (empty($fname7)) {
+				$fname7 = $old_fname7;
+			}
+
+			// Update database record
+			$data = array(
+				'logo1' => $fname,
+				'logo2' => $fname2,
+				'logo3' => $fname3,
+				'logo4' => $fname4,
+				'logo5' => $fname5,
+				'logo6' => $fname6,
+				'logo7' => $fname7,
+			);
+			// print_r($data);print_r($_POST);exit;
+
+			$result = $this->db->update('xin_quo', $data, array('id' => $id));
+			$set_img = base_url() . "uploads/quo/";
+
+			if ($result) {
+				$Return['result'] = "Data Updated Successfully";
+			} else {
+				$Return['error'] = "Data Update Failed";
+			}
+
+			$this->output($Return);
+			exit;
+
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($Return));
+			exit;
+		}
+	}
+	public function remove_logo()
+	{
+
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+		$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+		$logo_id = $this->input->post('logo_id');
+		$logo_name = $this->input->post('logo_name');
+
+		$file_path = FCPATH . 'uploads/quo/' . $logo_name;
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => $this->security->get_csrf_hash());
+
+		if (file_exists($file_path)) {
+			if (unlink($file_path)) {
+				$this->db->update('xin_quo', array('logo' . $logo_id => ''), array('id' => 1));
+				$Return['logo' . $logo_id] = base_url() .  'uploads/quo/no_logo.jpg';
+				$Return['result'] = 'Logo removed successfully.';
+			} else {
+				$Return['error'] = 'File could not be deleted.';
+			}
+		} else {
+			$Return['error'] = 'File does not exist.';
+		}
+
+		// Make sure to send proper JSON headers
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($Return));
+	}
+	public function remove_inv_logo()
+	{
+
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+		$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+		// $logo_id = $this->input->post('logo_id');
+		$logo_name = $this->input->post('logo_name');
+
+		$file_path = FCPATH . 'uploads/logo/' . $logo_name;
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => $this->security->get_csrf_hash());
+
+		if (file_exists($file_path)) {
+			if (unlink($file_path)) {
+				$this->db->update('xin_system_setting', array('invoice_logo' => ''), array('setting_id' => 1));
+				$Return[$logo_name] = base_url() .  'uploads/quo/no_logo.jpg';
+				$Return['result'] = 'Logo removed successfully.';
+			} else {
+				$Return['error'] = 'File could not be deleted.';
+			}
+		} else {
+			$Return['error'] = 'File does not exist.';
+		}
+
+		// Make sure to send proper JSON headers
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($Return));
+	}
+	public function remove_inv_addr_logo()
+	{
+
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+		$Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+		// $logo_id = $this->input->post('logo_id');
+		$logo_name = $this->input->post('logo_name');
+
+		$file_path = FCPATH . 'uploads/logo/' . $logo_name;
+		$Return = array('result' => '', 'error' => '', 'csrf_hash' => $this->security->get_csrf_hash());
+
+		if (file_exists($file_path)) {
+			if (unlink($file_path)) {
+				$this->db->update('xin_system_setting', array('invoice_address_logo' => ''), array('setting_id' => 1));
+				$Return[$logo_name] = base_url() .  'uploads/quo/no_logo.jpg';
+				$Return['result'] = 'Logo removed successfully.';
+			} else {
+				$Return['error'] = 'File could not be deleted.';
+			}
+		} else {
+			$Return['error'] = 'File does not exist.';
+		}
+
+		// Make sure to send proper JSON headers
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($Return));
 	}
 }
