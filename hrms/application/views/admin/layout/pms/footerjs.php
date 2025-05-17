@@ -195,7 +195,12 @@
     <script type="text/javascript">
         var jQuery_3_2_1 = $.noConflict(true);
     </script>
-    <script type="text/javascript" src="<?php echo base_url(); ?>skin/hrsale_assets/vendor/kendo/kendo.all.min.js"></script>
+    <!-- <script type="text/javascript" src="<?php echo base_url(); ?>skin/hrsale_assets/vendor/kendo/kendo.all.min.js"></script> -->
+
+
+<!-- Kendo UI JavaScript -->
+<script src="https://kendo.cdn.telerik.com/2025.1.227/js/kendo.all.min.js"></script>
+
     <!-- <script> jQuery.noConflict(true);</script> -->
     <?php $this->load->view('admin/roles/role_values'); ?>
 <?php } ?>

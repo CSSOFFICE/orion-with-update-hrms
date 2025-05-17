@@ -136,12 +136,12 @@ if (isset($_GET['jd']) && isset($_GET['role_id']) && $_GET['data'] == 'role') {
 		});
 	</script>
 	<script>
-		jQuery_3_2_1("#treeview_m1").kendoTreeView({
+		$("#treeview_m1").kendoTreeView({
 			checkboxes: {
 				checkChildren: true,
 				//template: "<label class='custom-control custom-checkbox'><input type='checkbox' #= item.check# class='#= item.class #' name='role_resources[]' value='#= item.value #'  /><span class='custom-control-indicator'></span><span class='custom-control-description'>#= item.text #</span><span class='custom-control-info'>#= item.add_info #</span></label>"
 				/*template: "<label class='custom-control custom-checkbox'><input type='checkbox' #= item.check# class='#= item.class #' name='role_resources[]' value='#= item.value #'><span class='custom-control-label'>#= item.text # <small>#= item.add_info #</small></span></label>"*/
-				template: "<label><input type='checkbox' #= item.check# class='#= item.class #' name='role_resources[]' value='#= item.value #'> #= item.text #</label>"
+				template: "<label style='display:inline;'><input type='checkbox' #= item.check# class='#= item.class #' name='role_resources[]' value='#= item.value #' style='margin-right:5px;'> <span style='display:inline;'>#= item.text #</span></label>"
 			},
 			check: onCheck,
 			dataSource: [{
@@ -5287,7 +5287,7 @@ if (isset($_GET['jd']) && isset($_GET['role_id']) && $_GET['data'] == 'role') {
 			]
 		});
 
-		jQuery_3_2_1("#treeview_m2").kendoTreeView({
+		$("#treeview_m2").kendoTreeView({
 			checkboxes: {
 				checkChildren: true,
 				//template: "<label class='custom-control custom-checkbox'><input type='checkbox' #= item.check# class='#= item.class #' name='role_resources[]' value='#= item.value #'  /><span class='custom-control-indicator'></span><span class='custom-control-description'>#= item.text #</span><span class='custom-control-info'>#= item.add_info #</span></label>"
@@ -7386,7 +7386,7 @@ if (isset($_GET['jd']) && isset($_GET['role_id']) && $_GET['data'] == 'role') {
 		// show checked node IDs on datasource change
 		function onCheck() {
 			var checkedNodes = [],
-				treeView = jQuery_3_2_1("#treeview").data("kendoTreeView"),
+				treeView = $("#treeview").data("kendoTreeView"),
 				message;
 			//checkedNodeIds(treeView.dataSource.view(), checkedNodes);
 			jQuery("#result").html(message);
@@ -7395,9 +7395,9 @@ if (isset($_GET['jd']) && isset($_GET['role_id']) && $_GET['data'] == 'role') {
 			$("#role_access_modal").change(function() {
 				var sel_val = $(this).val();
 				if (sel_val == '1') {
-					$('.role-checkbox-modal-modal').prop('checked', true);
+					$('.role-checkbox-modal').prop('checked', true);
 				} else {
-					$('.role-checkbox-modal-modal').prop("checked", false);
+					$('.role-checkbox-modal').prop('checked', false);
 				}
 			});
 		});
