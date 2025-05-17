@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 if (isset($_GET['jd']) && isset($_GET['role_id']) && $_GET['data'] == 'role') {
 	$role_resources_ids = explode(',', $role_resources);
 ?>
+
 	<div class="modal-header">
 		<?php echo form_button(array('aria-label' => 'Close', 'data-dismiss' => 'modal', 'type' => 'button', 'class' => 'close', 'content' => '<span aria-hidden="true">×</span>')); ?>
 		<h4 class="modal-title" id="edit-modal-data"><?php echo $this->lang->line('xin_role_editrole'); ?></h4>

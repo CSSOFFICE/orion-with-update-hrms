@@ -1024,6 +1024,13 @@ $lang['xin_overtime_per_hour'] = 'Overtime Per Hour';
 $lang['xin_not_paid'] = 'Not Paid';
 $lang['xin_payroll_allowances'] = 'Allowances';
 $lang['xin_deductions'] = 'Deductions';
+$lang['xin_deduction'] = 'Deductions';
+$lang['xin_deduction_type'] = 'Deduction Type';
+$lang['xin_error_deduction_type_field']='Deduction Type Field is required';
+$lang['xin_deduction_type_added']="Deduction Type Added";
+$lang['xin_deduction_type_updated']="Deduction Type Updated";
+$lang['xin_deduction_type_deleted']="Deduction Type Deleted";
+
 $lang['xin_payroll_employee_hourly_wages'] = 'Employee Salary Details (Hourly Wage)';
 $lang['xin_payroll_hourly_rate'] = 'Hourly Rate';
 $lang['xin_payroll_hourly_wage'] = 'Hourly Wage';

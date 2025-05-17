@@ -21118,4 +21118,130 @@ class Payroll extends MY_Controller
 		}
 		$this->output($Return);
 	}
+	// hourly_list > templates
+	public function payment_history_list()
+	{
+
+		$data['title'] = $this->Xin_model->site_title();
+		$session = $this->session->userdata('username');
+		if (!empty($session)) {
+			$this->load->view("admin/payroll/payment_history", $data);
+		} else {
+			redirect('admin/');
+		}
+		// Datatables Variables
+		$draw = intval($this->input->get("draw"));
+		$start = intval($this->input->get("start"));
+		$length = intval($this->input->get("length"));
+
+		$role_resources_ids = $this->Xin_model->user_role_resource();
+		$user_info = $this->Xin_model->read_user_info($session['user_id']);
+		if ($this->input->get("ihr") == 'true') {
+			if ($this->input->get("company_id") == 0 && $this->input->get("location_id") == 0 && $this->input->get("department_id") == 0) {
+				if ($this->input->get("salary_month") == '') {
+					$history = $this->Payroll_model->all_employees_payment_history();
+				} else {
+					$history = $this->Payroll_model->all_employees_payment_history_month($this->input->get("salary_month"));
+				}
+			} else if ($this->input->get("company_id") != 0 && $this->input->get("location_id") == 0 && $this->input->get("department_id") == 0) {
+				if ($this->input->get("salary_month") == '') {
+					$history = $this->Payroll_model->get_company_payslip_history($this->input->get("company_id"));
+				} else {
+					$history = $this->Payroll_model->get_company_payslip_history_month($this->input->get("company_id"), $this->input->get("salary_month"));
+				}
+			} else if ($this->input->get("company_id") != 0 && $this->input->get("location_id") != 0 && $this->input->get("department_id") == 0) {
+				if ($this->input->get("salary_month") == '') {
+					$history = $this->Payroll_model->get_company_location_payslips($this->input->get("company_id"), $this->input->get("location_id"));
+				} else {
+					$history = $this->Payroll_model->get_company_location_payslips_month($this->input->get("company_id"), $this->input->get("location_id"), $this->input->get("salary_month"));
+				}
+			} else if ($this->input->get("company_id") != 0 && $this->input->get("location_id") != 0 && $this->input->get("department_id") != 0) {
+				if ($this->input->get("salary_month") == '') {
+					$history = $this->Payroll_model->get_company_location_department_payslips($this->input->get("company_id"), $this->input->get("location_id"), $this->input->get("department_id"));
+				} else {
+					$history = $this->Payroll_model->get_company_location_department_payslips_month($this->input->get("company_id"), $this->input->get("location_id"), $this->input->get("department_id"), $this->input->get("salary_month"));
+				}
+			}/**/ /*else if($this->input->get("company_id")!=0 && $this->input->get("location_id")!=0 && $this->input->get("department_id")!=0 && $this->input->get("designation_id")!=0){
+				$history = $this->Payroll_model->get_company_location_department_designation_payslips($this->input->get("company_id"),$this->input->get("location_id"),$this->input->get("department_id"),$this->input->get("designation_id"));
+			}*/
+		} else {
+			if ($user_info[0]->user_role_id == 1) {
+				$history = $this->Payroll_model->employees_payment_history();
+			} else {
+				if (in_array('391', $role_resources_ids)) {
+					$history = $this->Payroll_model->get_company_payslips($user_info[0]->company_id);
+				} else {
+					$history = $this->Payroll_model->get_payroll_slip($session['user_id']);
+				}
+			}
+		}
+		$data = array();
+
+		foreach ($history->result() as $r) {
+
+			// get addd by > template
+			$user = $this->Xin_model->read_user_info($r->employee_id);
+			// user full name
+			if (!is_null($user)) {
+				$full_name = $user[0]->first_name . ' ' . $user[0]->last_name;
+				$emp_link = $user[0]->employee_id;
+				$month_payment = date("F, Y", strtotime('01-' . $r->salary_month));
+
+				$p_amount = $this->Xin_model->currency_sign($r->net_salary, $r->user_id);
+
+				// get date > created at > and format
+				$created_at = $this->Xin_model->set_date_format($r->created_at);
+				// get designation
+				$designation = $this->Designation_model->read_designation_information($user[0]->designation_id);
+				if (!is_null($designation)) {
+					$designation_name = $designation[0]->designation_name;
+				} else {
+					$designation_name = '--';
+				}
+				// department
+				$department = $this->Department_model->read_department_information($user[0]->department_id);
+				if (!is_null($department)) {
+					$department_name = $department[0]->department_name;
+				} else {
+					$department_name = '--';
+				}
+				$department_designation = $designation_name . ' (' . $department_name . ')';
+				// get company
+				$company = $this->Xin_model->read_company_info($user[0]->company_id);
+				if (!is_null($company)) {
+					$comp_name = $company[0]->name;
+				} else {
+					$comp_name = '--';
+				}
+				// bank account
+				$bank_account = $this->Employees_model->get_employee_bank_account_last($user[0]->user_id);
+				if (!is_null($bank_account)) {
+					$account_number = $bank_account[0]->account_number;
+				} else {
+					$account_number = '--';
+				}
+				$payslip = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_view') . '"><a href="' . site_url() . 'admin/payroll/payslip/id/' . $r->payslip_key . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light"><span class="fa fa-arrow-circle-right"></span></button></a></span><span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('xin_download') . '"><a href="' . site_url() . 'admin/payroll/pdf_create/p/' . $r->payslip_key . '"><button type="button" class="btn icon-btn btn-xs btn-default waves-effect waves-light"><span class="fa fa-download"></span></button></a></span>';
+
+				$ifull_name = nl2br($full_name . "\r\n <small class='text-muted'><i>" . $this->lang->line('xin_employees_id') . ': ' . $emp_link . "<i></i></i></small>\r\n <small class='text-muted'><i>" . $department_designation . '<i></i></i></small>');
+				$data[] = array(
+					$payslip,
+					$full_name,
+					$comp_name,
+					$account_number,
+					$p_amount,
+					$month_payment,
+					$created_at,
+				);
+			}
+		} // if employee available
+
+		$output = array(
+			"draw" => $draw,
+			"recordsTotal" => $history->num_rows(),
+			"recordsFiltered" => $history->num_rows(),
+			"data" => $data
+		);
+		echo json_encode($output);
+		exit();
+	}
 }

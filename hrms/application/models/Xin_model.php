@@ -3737,7 +3737,7 @@ ORDER BY `expiry_date`");
 	public function count_get_user_documents_expired_all($employee_id)
 	{
 
-		$curr_date = date('d-m-Y');
+		$curr_date = date('Y-m-d');
 		$query = $this->db->query("SELECT * from xin_employee_documents where employee_id = '" . $employee_id . "' and STR_TO_DATE(date_of_expiry,'%d-%m-%Y') < '" . $curr_date . "' and date_of_expiry !='' and date_of_expiry is not null ORDER BY `date_of_expiry` asc");
 		return $query->num_rows();
 	}
@@ -3768,7 +3768,7 @@ ORDER BY `expiry_date`");
 	{
 
 		$curr_date = date('Y-m-d');
-		$sql = "SELECT * FROM xin_company_documents WHERE STR_TO_DATE(expiry_date,'%d-%m-%Y') < '" . $curr_date . "' and company_id = ?  and warranty_end_date !='' and warranty_end_date is not null";
+		$sql = "SELECT * FROM xin_company_documents WHERE STR_TO_DATE(expiry_date,'%d-%m-%Y') < '" . $curr_date . "' and company_id = ?  ";
 		$binds = array($company_id);
 		$query = $this->db->query($sql, $binds);
 		return $query->num_rows();
