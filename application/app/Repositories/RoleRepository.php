@@ -144,6 +144,7 @@ class RoleRepository
         //data - for security,we will do some extra validations for each entry
         $role->role_name = ucwords(request('role_name'));
         $role->role_clients = (in_array(request('role_clients'), $valid)) ? request('role_clients') : 0;
+        $role->role_projects_billing = (in_array(request('role_projects_billing'), $valid)) ? request('role_projects_billing') : 0;
         $role->role_contacts = (in_array(request('role_contacts'), $valid)) ? request('role_contacts') : 0;
         $role->role_invoices = (in_array(request('role_invoices'), $valid)) ? request('role_invoices') : 0;
         $role->role_estimates = (in_array(request('role_estimates'), $valid)) ? request('role_estimates') : 0;
