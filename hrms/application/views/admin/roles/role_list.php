@@ -6,6 +6,12 @@
     #add_form {
         height: 100% !important;
     }
+    [type="checkbox"]:not(:checked),
+    [type="checkbox"]:checked {
+        position: relative;
+        left: 0;
+        opacity: 2;
+    }
 </style>
 <?php $session = $this->session->userdata('username');?>
 <?php $get_animate = $this->Xin_model->get_content_animate();?>
@@ -142,7 +148,5 @@
 .k-treeview-leaf{
     display:none !important; 
 }
-li{
- types: none;
-}
+
 </style>
